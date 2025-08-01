@@ -1,0 +1,35 @@
+name: ecmsp-dev
+
+services:
+    order-service-db-dev:
+        image: postgres:15-alpine
+        container_name: order-service-db-dev
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+            interval: 10s
+            retries: 5
+            start_period: 30s
+            timeout: 10s
+
+        ports:
+            - "5432:5432"
+        volumes:
+            - order-service-db:/var/lib/postgresql/data
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+        secrets:
+            - order-service-db-password
+        environment:
+            - POSTGRES_USER=admin
+            - POSTGRES_DB=cart-service-db
+            - POSTGRES_PASSWORD_FILE=/run/secrets/order-service-db-password
+        env_file:
+            -
+                path: ./database-env.txt
+                required: false
+
+volumes:
+    order-service-db:
+
+secrets:
+    order-service-db-password:
+        file: ./database-password.txt
