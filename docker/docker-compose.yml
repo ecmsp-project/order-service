@@ -14,7 +14,7 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - order-service-db:/var/lib/postgresql/data
+            - order-service-db-dev:/var/lib/postgresql/data
             - ./init.sql:/docker-entrypoint-initdb.d/init.sql
         secrets:
             - order-service-db-password
@@ -28,7 +28,7 @@ services:
                 required: false
 
 volumes:
-    order-service-db:
+    order-service-db-dev:
 
 secrets:
     order-service-db-password:
