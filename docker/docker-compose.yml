@@ -20,7 +20,7 @@ services:
             - order-service-db-password
         environment:
             - POSTGRES_USER=admin
-            - POSTGRES_DB=cart-service-db
+            - POSTGRES_DB=order-service-db
             - POSTGRES_PASSWORD_FILE=/run/secrets/order-service-db-password
         env_file:
             -
