@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: Order service
+
+
+order:
+  repository:
+    type: db
+
+
+payment:
+  client:
+    type: kafka
+
+kafka:
+  topic:
+    payment-processed-succeeded: payment-processed-succeeded
+    payment-processed-failed: payment-processed-failed
+    payment-request: payment-request
+    cart-event: cart-event
