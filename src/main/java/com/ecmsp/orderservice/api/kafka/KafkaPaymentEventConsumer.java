@@ -7,6 +7,8 @@ import com.ecmsp.orderservice.order.domain.OrderToUpdate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 
 @Component
 public class KafkaPaymentEventConsumer {
@@ -23,7 +25,7 @@ public class KafkaPaymentEventConsumer {
     public void consume(PaymentProcessedKafkaEventSucceeded paymentProcessedKafkaEventSucceeded) {
         orderFacade.updateOrder(
                 new OrderToUpdate(
-                        OrderId.from(paymentProcessedKafkaEventSucceeded.orderId()),
+                        new OrderId(UUID.fromString(paymentProcessedKafkaEventSucceeded.orderId())),
                         OrderStatus.PAID
                 )
         );
@@ -34,7 +36,7 @@ public class KafkaPaymentEventConsumer {
     public void consume(PaymentProcessedKafkaEventFailed paymentProcessedKafkaEventFailed) {
         orderFacade.updateOrder(
                 new OrderToUpdate(
-                        OrderId.from(paymentProcessedKafkaEventFailed.orderId()),
+                        new OrderId(UUID.fromString(paymentProcessedKafkaEventFailed.orderId())),
                         OrderStatus.FAILED
                 )
         );

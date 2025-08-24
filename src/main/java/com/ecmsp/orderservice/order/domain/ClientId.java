@@ -9,4 +9,5 @@ public record ClientId(UUID value) {
         return value.toString();
     }
 
+
 }

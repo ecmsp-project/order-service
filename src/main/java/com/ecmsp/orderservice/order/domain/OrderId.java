@@ -9,8 +9,5 @@ public record OrderId(UUID value) {
         return value.toString();
     }
 
-    public static OrderId from(String orderId) {
-        return new OrderId(UUID.fromString(orderId));
-    }
 
 }

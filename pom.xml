@@ -88,6 +88,7 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
+
 		<!-- Core Kafka Client -->
 		<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
 		<dependency>
@@ -112,7 +113,21 @@
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-spring-boot-starter</artifactId>
+            <version>2.15.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>1.58.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>1.58.0</version>
+        </dependency>
 		<!-- SLF4J for logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -252,20 +267,40 @@
 					</excludes>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <configuration>
+                    <!-- Use direct artifact references instead of classifier -->
+                    <protocExecutable>protoc</protocExecutable>
+                    <pluginId>grpc-java</pluginId>
+                    <protoSourceRoot>src/main/proto</protoSourceRoot>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
 		</plugins>
 	</build>
 
-	<repositories>
-		<repository>
-			<id>nexus-ecmsp-releases</id>
-			<name>nexus-ecmsp-releases</name>
-			<url>https://nexus.ecmsp.pl/repository/maven-releases/</url>
-		</repository>
-		<repository>
-			<id>nexus-ecmsp-snapshots</id>
-			<name>nexus-ecmsp-snapshots</name>
-			<url>https://nexus.ecmsp.pl/repository/maven-snapshots/</url>
-		</repository>
-	</repositories>
+<!--	<repositories>-->
+<!--		<repository>-->
+<!--			<id>nexus-ecmsp-releases</id>-->
+<!--			<name>nexus-ecmsp-releases</name>-->
+<!--			<url>https://nexus.ecmsp.pl/repository/maven-releases/</url>-->
+<!--		</repository>-->
+<!--		<repository>-->
+<!--			<id>nexus-ecmsp-snapshots</id>-->
+<!--			<name>nexus-ecmsp-snapshots</name>-->
+<!--			<url>https://nexus.ecmsp.pl/repository/maven-snapshots/</url>-->
+<!--		</repository>-->
+<!--	</repositories>-->
 
 </project>

@@ -9,7 +9,4 @@ public record ItemId(UUID value) {
         return value.toString();
     }
 
-    public static ItemId from(String itemId) {
-        return new ItemId(UUID.fromString(itemId));
-    }
 }
