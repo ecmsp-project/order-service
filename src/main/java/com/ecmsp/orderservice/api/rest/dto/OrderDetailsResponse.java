@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.api.dto;
+package com.ecmsp.orderservice.api.rest.dto;
 
 
 import java.time.LocalDateTime;

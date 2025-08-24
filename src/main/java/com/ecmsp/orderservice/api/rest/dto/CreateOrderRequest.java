@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.api.dto;
+package com.ecmsp.orderservice.api.rest.dto;
 
 import com.ecmsp.orderservice.order.domain.ItemId;
 import com.ecmsp.orderservice.order.domain.OrderItem;

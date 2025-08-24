@@ -1,3 +1,5 @@
 order:
   repository:
     type: in-memory
+  payment-client:
+    type: in-memory
