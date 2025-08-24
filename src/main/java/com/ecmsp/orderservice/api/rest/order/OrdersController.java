@@ -1,8 +1,8 @@
-package com.ecmsp.orderservice.api.rest;
+package com.ecmsp.orderservice.api.rest.order;
 
-import com.ecmsp.orderservice.api.rest.dto.CreateOrderRequest;
-import com.ecmsp.orderservice.api.rest.dto.OrderDetailsResponse;
-import com.ecmsp.orderservice.api.rest.dto.UpdateOrderRequest;
+import com.ecmsp.orderservice.api.rest.order.dto.CreateOrderRequest;
+import com.ecmsp.orderservice.api.rest.order.dto.OrderDetailsResponse;
+import com.ecmsp.orderservice.api.rest.order.dto.UpdateOrderRequest;
 import com.ecmsp.orderservice.order.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

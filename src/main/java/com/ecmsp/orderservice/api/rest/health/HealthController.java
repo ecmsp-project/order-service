@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.api.rest;
+package com.ecmsp.orderservice.api.rest.health;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

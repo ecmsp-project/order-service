@@ -5,6 +5,7 @@ import com.ecmsp.orderservice.order.domain.OrderId;
 import com.ecmsp.orderservice.order.domain.OrderStatus;
 import com.ecmsp.orderservice.order.domain.OrderToUpdate;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 
@@ -20,7 +21,7 @@ public class KafkaPaymentEventConsumer {
 
 
     @KafkaListener(topics = "${kafka.topic.payment-processed-succeeded}")
-    public void consume(PaymentProcessedKafkaEventSucceeded paymentProcessedKafkaEventSucceeded) {
+    public void consume(@Payload PaymentProcessedKafkaEventSucceeded paymentProcessedKafkaEventSucceeded) {
         orderFacade.updateOrder(
                 new OrderToUpdate(
                         OrderId.from(paymentProcessedKafkaEventSucceeded.orderId()),
