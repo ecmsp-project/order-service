@@ -1,5 +1,11 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+
 order:
   repository:
     type: in-memory
   payment-client:
+    type: in-memory
+  event-publisher:
     type: in-memory

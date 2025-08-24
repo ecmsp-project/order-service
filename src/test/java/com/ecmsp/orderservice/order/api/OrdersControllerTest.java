@@ -1,6 +1,6 @@
 package com.ecmsp.orderservice.order.api;
 
-import com.ecmsp.orderservice.api.rest.OrdersController;
+import com.ecmsp.orderservice.api.rest.order.OrdersController;
 import com.ecmsp.orderservice.order.domain.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
