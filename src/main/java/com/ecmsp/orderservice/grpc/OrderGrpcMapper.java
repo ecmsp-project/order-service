@@ -1,7 +1,8 @@
 package com.ecmsp.orderservice.grpc;
-import com.ecmsp.orderservice.grpc.OrderServiceProto.OrderResponse;
-import com.ecmsp.orderservice.grpc.OrderServiceProto.OrderItemDetails;
-import com.ecmsp.orderservice.grpc.OrderStatusProto;
+import com.ecmsp.order.v1.*;
+import com.ecmsp.orderservice.order.domain.OrderItem;
+import com.ecmsp.orderservice.order.domain.OrderStatus;
+
 import com.ecmsp.orderservice.order.domain.*;
 import org.springframework.stereotype.Component;
 
@@ -29,21 +30,59 @@ public class OrderGrpcMapper {
                 .build();
     }
 
+    public GetOrderResponse toGetOrderResponse(Order order) {
+        OrderResponse baseResponse = toOrderResponse(order);
+
+        return GetOrderResponse.newBuilder()
+                .setOrderId(baseResponse.getOrderId())
+                .setClientId(baseResponse.getClientId())
+                .setOrderStatus(baseResponse.getOrderStatus())
+                .setDate(baseResponse.getDate())
+                .addAllItems(baseResponse.getItemsList())
+                .build();
+    }
 
 
-    public OrderStatusProto.OrderStatus toOrderStatusProto(OrderStatus orderStatusDomain) {
+
+    public CreateOrderResponse toCreateOrderResponse(Order order) {
+        OrderResponse baseResponse = toOrderResponse(order);
+
+        return CreateOrderResponse.newBuilder()
+                .setOrderId(baseResponse.getOrderId())
+                .setClientId(baseResponse.getClientId())
+                .setOrderStatus(baseResponse.getOrderStatus())
+                .setDate(baseResponse.getDate())
+                .addAllItems(baseResponse.getItemsList())
+                .build();
+    }
+
+
+    public UpdateOrderResponse toUpdateOrderResponse(Order order) {
+        OrderResponse baseResponse = toOrderResponse(order);
+
+        return UpdateOrderResponse.newBuilder()
+                .setOrderId(baseResponse.getOrderId())
+                .setClientId(baseResponse.getClientId())
+                .setOrderStatus(baseResponse.getOrderStatus())
+                .setDate(baseResponse.getDate())
+                .addAllItems(baseResponse.getItemsList())
+                .build();
+    }
+
+
+    public com.ecmsp.order.v1.OrderStatus toOrderStatusProto(OrderStatus orderStatusDomain) {
         return switch (orderStatusDomain) {
-            case PENDING -> OrderStatusProto.OrderStatus.ORDER_STATUS_PENDING;
-            case PROCESSING -> OrderStatusProto.OrderStatus.ORDER_STATUS_PROCESSING;
-            case PAID -> OrderStatusProto.OrderStatus.ORDER_STATUS_PAID;
-            case FAILED -> OrderStatusProto.OrderStatus.ORDER_STATUS_FAILED;
-            case CANCELLED -> OrderStatusProto.OrderStatus.ORDER_STATUS_CANCELLED;
-            default -> OrderStatusProto.OrderStatus.ORDER_STATUS_UNSPECIFIED;
+            case PENDING -> com.ecmsp.order.v1.OrderStatus.ORDER_STATUS_PENDING;
+            case PROCESSING -> com.ecmsp.order.v1.OrderStatus.ORDER_STATUS_PROCESSING;
+            case PAID -> com.ecmsp.order.v1.OrderStatus.ORDER_STATUS_PAID;
+            case FAILED -> com.ecmsp.order.v1.OrderStatus.ORDER_STATUS_FAILED;
+            case CANCELLED -> com.ecmsp.order.v1.OrderStatus.ORDER_STATUS_CANCELLED;
+            default -> com.ecmsp.order.v1.OrderStatus.ORDER_STATUS_UNSPECIFIED;
         };
     }
 
 
-    public OrderStatus toOrderStatusDomain(OrderStatusProto.OrderStatus orderStatusProto) {
+    public OrderStatus toOrderStatusDomain(com.ecmsp.order.v1.OrderStatus orderStatusProto) {
         return switch (orderStatusProto) {
             case ORDER_STATUS_PENDING -> PENDING;
             case ORDER_STATUS_PROCESSING -> PROCESSING;
@@ -55,7 +94,7 @@ public class OrderGrpcMapper {
     }
 
 
-    public OrderToCreate toOrderToCreate(com.ecmsp.orderservice.grpc.OrderServiceProto.CreateOrderRequest request) {
+    public OrderToCreate toOrderToCreate(CreateOrderRequest request) {
         return new OrderToCreate(
                 new ClientId(UUID.fromString(request.getClientId())),
                 request.getItemsList().stream()
@@ -64,7 +103,7 @@ public class OrderGrpcMapper {
         );
     }
 
-    public OrderToUpdate toOrderToUpdate(com.ecmsp.orderservice.grpc.OrderServiceProto.UpdateOrderRequest request) {
+    public OrderToUpdate toOrderToUpdate(UpdateOrderRequest request) {
         return new OrderToUpdate(
                 new OrderId(UUID.fromString(request.getOrderId())),
                 toOrderStatusDomain(request.getOrderStatus())
@@ -78,7 +117,7 @@ public class OrderGrpcMapper {
                 .build();
     }
 
-    private OrderItem toOrderItem(com.ecmsp.orderservice.grpc.OrderServiceProto.OrderItem item) {
+    private OrderItem toOrderItem(com.ecmsp.order.v1.OrderItem item) {
         return new OrderItem(
                 new ItemId(UUID.fromString(item.getItemId())),
                 item.getQuantity(),
