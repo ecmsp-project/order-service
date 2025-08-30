@@ -1,8 +1,6 @@
 package com.ecmsp.orderservice.e2e.tests;
 
 import com.ecmsp.orderservice.e2e.E2ETestEnvironment;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import org.junit.jupiter.api.Test;
 
 import static com.ecmsp.orderservice.e2e.E2ETestEnvironment.Containers.ORDER_SERVICE;
