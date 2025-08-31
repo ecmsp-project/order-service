@@ -47,25 +47,38 @@ public final class E2ETestEnvironment {
                             cmd.withName("order-service")
                     )
                     .withNetwork(NETWORK)
-                    .dependsOn(KAFKA_CONTAINER);
-//                    .withEnv("DB_URL", "jdbc:postgresql://postgres:5432/orderdb")
-//                    .withEnv("DB_USERNAME", "admin")
-//                    .withEnv("DB_PASSWORD", "admin")
-//                    .withEnv("KAFKA_URL", "kafka:9094");
+                    .dependsOn(KAFKA_CONTAINER)
+                    .withEnv("DB_URL", "jdbc:postgresql://postgres:5432/orderdb")
+                    .withEnv("DB_USERNAME", "admin")
+                    .withEnv("DB_PASSWORD", "admin")
+                    .withEnv("KAFKA_URL", "kafka:9094");
 
     static {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
-        System.setProperty("org.testcontainers.debug", "true");
-        ORDER_SERVICE_CONTAINER.start(); // start only once
-//        POSTGRES_CONTAINER.start();
-        KAFKA_CONTAINER.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            ORDER_SERVICE_CONTAINER.stop();
-            POSTGRES_CONTAINER.stop();
-            KAFKA_CONTAINER.stop();
+            if(ORDER_SERVICE_CONTAINER.isCreated()){
+                ORDER_SERVICE_CONTAINER.stop();
+            }
+            if(KAFKA_CONTAINER.isCreated()){
+                KAFKA_CONTAINER.stop();
+            }
+            if(POSTGRES_CONTAINER.isCreated()){
+                POSTGRES_CONTAINER.stop();
+            }
             NETWORK.close();
         }));
+
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+        System.setProperty("org.testcontainers.debug", "true");
+        POSTGRES_CONTAINER.start();
+        KAFKA_CONTAINER.start();
+        try {
+            ORDER_SERVICE_CONTAINER.start(); // start only once
+        } catch (Exception e) {
+            System.out.println("Container logs: \n" + ORDER_SERVICE_CONTAINER.getLogs());
+            throw new RuntimeException(e);
+        }
+
     }
 
     public static String getUrl(Containers container) {
