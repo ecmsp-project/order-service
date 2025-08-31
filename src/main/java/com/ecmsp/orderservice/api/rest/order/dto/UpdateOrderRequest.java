@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.api.dto;
+package com.ecmsp.orderservice.api.rest.order.dto;
 
 import com.ecmsp.orderservice.order.domain.OrderStatus;
 

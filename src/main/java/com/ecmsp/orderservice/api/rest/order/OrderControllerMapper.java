@@ -1,6 +1,6 @@
-package com.ecmsp.orderservice.api.rest;
+package com.ecmsp.orderservice.api.rest.order;
 
-import com.ecmsp.orderservice.api.dto.OrderDetailsResponse;
+import com.ecmsp.orderservice.api.rest.order.dto.OrderDetailsResponse;
 import com.ecmsp.orderservice.order.domain.Order;
 
 public class OrderControllerMapper {
