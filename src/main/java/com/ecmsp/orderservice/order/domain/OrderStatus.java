@@ -6,4 +6,5 @@ public enum OrderStatus {
     PAID,
     FAILED,
     CANCELLED,
+    UNSPECIFIED // Added to match the protobuf enum
 }

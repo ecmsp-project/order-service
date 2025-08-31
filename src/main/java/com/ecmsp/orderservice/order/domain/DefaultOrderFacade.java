@@ -74,6 +74,8 @@ public class DefaultOrderFacade implements OrderFacade {
                 currentOrder.items()
         );
 
+
+
         orderRepository.update(updatedOrder);
         orderEventPublisher.publish(
                 new OrderEvent.OrderStatusUpdated(
