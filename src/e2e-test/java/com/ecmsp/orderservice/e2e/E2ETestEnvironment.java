@@ -7,6 +7,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.kafka.KafkaContainer;
 
+import java.net.URI;
 import java.nio.file.Paths;
 
 public final class E2ETestEnvironment {
@@ -81,16 +82,17 @@ public final class E2ETestEnvironment {
 
     }
 
-    public static String getUrl(Containers container) {
+    public static URI getUrl(Containers container) {
         return switch (container) {
             case ORDER_SERVICE ->
-                    "http://" + ORDER_SERVICE_CONTAINER.getHost() + ":" + ORDER_SERVICE_CONTAINER.getMappedPort(8080);
-            case KAFKA -> KAFKA_CONTAINER.getBootstrapServers();
+                    URI.create(ORDER_SERVICE_CONTAINER.getHost() + ":" + ORDER_SERVICE_CONTAINER.getMappedPort(8080));
+            case KAFKA -> URI.create(KAFKA_CONTAINER.getHost() + ":" + KAFKA_CONTAINER.getMappedPort(9093));
             case POSTGRES ->
-                    "jdbc:postgresql://" + POSTGRES_CONTAINER.getHost() + ":" + POSTGRES_CONTAINER.getMappedPort(
-                            5432);
+                    URI.create(POSTGRES_CONTAINER.getHost() + ":" + POSTGRES_CONTAINER.getMappedPort(5432));
         };
     }
+
+
 
     public enum Containers {
         ORDER_SERVICE, KAFKA, POSTGRES
