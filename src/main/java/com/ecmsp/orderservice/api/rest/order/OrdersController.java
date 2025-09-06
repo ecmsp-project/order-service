@@ -50,7 +50,7 @@ public class OrdersController {
                 .map(CreateOrderRequest.Item::toOrderItem)
                 .toList()
         );
-        Order order = orderFacade.createOrder(orderToCreate);
+        Order order = orderFacade.createOrder(orderToCreate, null);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.toOrderDetailsResponse(order));
     }
 

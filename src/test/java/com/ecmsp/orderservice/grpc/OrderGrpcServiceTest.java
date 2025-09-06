@@ -1,6 +1,8 @@
 package com.ecmsp.orderservice.grpc;
 
 import com.ecmsp.order.v1.*;
+import com.ecmsp.orderservice.api.grpc.OrderGrpcMapper;
+import com.ecmsp.orderservice.api.grpc.OrderGrpcService;
 import com.ecmsp.orderservice.order.domain.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -36,7 +38,7 @@ class OrderGrpcServiceTest {
     private final OrderFacade orderFacade = mock(OrderFacade.class);
     private final OrderGrpcMapper orderGrpcMapper = mock(OrderGrpcMapper.class);
     @InjectMocks
-    private  OrderGrpcService orderGrpcService;
+    private OrderGrpcService orderGrpcService;
 
     private Order testOrder;
 
@@ -150,7 +152,7 @@ class OrderGrpcServiceTest {
                     .build();
 
             when(orderGrpcMapper.toOrderToCreate(request)).thenReturn(orderToCreate);
-            when(orderFacade.createOrder(orderToCreate)).thenReturn(testOrder);
+            when(orderFacade.createOrder(orderToCreate, null)).thenReturn(testOrder);
             when(orderGrpcMapper.toCreateOrderResponse(testOrder)).thenReturn(expectedResponse);
 
             // when
@@ -158,7 +160,7 @@ class OrderGrpcServiceTest {
 
             // then
             verify(orderGrpcMapper).toOrderToCreate(request);
-            verify(orderFacade).createOrder(orderToCreate);
+            verify(orderFacade).createOrder(orderToCreate, null);
             verify(orderGrpcMapper).toCreateOrderResponse(testOrder);
             verify(responseObserver).onNext(expectedResponse);
             verify(responseObserver).onCompleted();
@@ -175,7 +177,7 @@ class OrderGrpcServiceTest {
             OrderToCreate orderToCreate = new OrderToCreate(CLIENT_ID, List.of());
 
             when(orderGrpcMapper.toOrderToCreate(request)).thenReturn(orderToCreate);
-            when(orderFacade.createOrder(orderToCreate)).thenThrow(new RuntimeException("Creation failed"));
+            when(orderFacade.createOrder(orderToCreate, null)).thenThrow(new RuntimeException("Creation failed"));
 
             // when
             orderGrpcService.createOrder(request, responseObserver);

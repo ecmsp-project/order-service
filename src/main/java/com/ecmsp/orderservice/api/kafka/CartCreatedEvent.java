@@ -7,16 +7,16 @@ import com.ecmsp.orderservice.order.domain.OrderToCreate;
 
 import java.math.BigDecimal;
 import java.util.List;
-
+import java.util.UUID;
 
 
 public record CartCreatedEvent(
-        ClientId clientId,
+        UUID clientId,
         List<CartItem> items
 ) {
 
     public record CartItem(
-        ItemId itemId,
+        UUID itemId,
         String name,
         BigDecimal price,
         int quantity,
@@ -26,10 +26,10 @@ public record CartCreatedEvent(
 
     public static OrderToCreate toOrder(CartCreatedEvent cartEvent) {
         return new OrderToCreate(
-                /* clientId */ cartEvent.clientId(),
+                /* clientId */ new ClientId(cartEvent.clientId()),
                 /* items */ cartEvent.items().stream()
                 .map(cartItem -> new OrderItem(
-                        cartItem.itemId(),
+                        new ItemId(cartItem.itemId()),
                         cartItem.quantity(),
                         cartItem.price()
                 )).toList()
