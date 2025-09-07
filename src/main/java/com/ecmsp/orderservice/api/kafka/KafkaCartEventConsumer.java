@@ -24,6 +24,7 @@ public class KafkaCartEventConsumer{
 
     @KafkaListener(topics = "${kafka.topic.cart-event}")
     public void consume(CartCreatedEvent cartEvent, @Header(value = "X-Correlation-Id", required = false) String correlationId) {
+        //TODO: we should validate is correlationId is valid UUID string
 
         MDC.put("correlationId", correlationId.toString());
         log.info("Processing cart event - CorrelationID: {}", correlationId);

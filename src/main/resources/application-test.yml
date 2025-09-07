@@ -1,0 +1,3 @@
+order:
+  id-generator:
+    type: fixed

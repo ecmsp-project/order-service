@@ -42,6 +42,7 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
     public void createOrder(CreateOrderRequest request, StreamObserver<CreateOrderResponse> responseObserver) {
         try {
             OrderToCreate orderToCreate = orderGrpcMapper.toOrderToCreate(request);
+            //TODO: provide support for grpc metadata in the future to obtain context data from it and pass it to OrderFacade
             Order createdOrder = orderFacade.createOrder(orderToCreate, null);
             CreateOrderResponse response = orderGrpcMapper.toCreateOrderResponse(createdOrder);
             responseObserver.onNext(response);

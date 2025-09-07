@@ -6,10 +6,10 @@ import com.ecmsp.orderservice.order.domain.OrderIdGenerator;
 
 import java.util.UUID;
 
-public class RandomOrderIdGenerator implements OrderIdGenerator {
+class RandomOrderIdGenerator implements OrderIdGenerator {
 
     @Override
     public OrderId generate(CorrelationId correlationId) {
-        return correlationId.value() != null ? new OrderId(correlationId.value()) : new OrderId(UUID.randomUUID());
+        return new OrderId(UUID.randomUUID());
     }
 }

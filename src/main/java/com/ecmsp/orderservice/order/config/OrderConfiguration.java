@@ -1,7 +1,8 @@
 package com.ecmsp.orderservice.order.config;
 
-import com.ecmsp.orderservice.order.adapter.generator.RandomOrderIdGenerator;
+import com.ecmsp.orderservice.order.adapter.generator.GeneratorFacade;
 import com.ecmsp.orderservice.order.domain.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,15 +11,39 @@ import java.time.Clock;
 @Configuration
 class OrderConfiguration {
 
-    @Bean
-    RandomOrderIdGenerator orderIdGenerator(){
-        return new RandomOrderIdGenerator();
+    private final GeneratorFacade generatorFacade;
+
+    OrderConfiguration(GeneratorFacade generatorFacade) {
+        this.generatorFacade = generatorFacade;
     }
+
+
+    @Bean
+    @ConditionalOnProperty(
+            name = "order.id-generator.type",
+            havingValue = "random",
+            matchIfMissing = true  // Default to random
+    )
+    OrderIdGenerator randomOrderIdGenerator(){
+        return generatorFacade.getRandomOrderIdGenerator();
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+            name = "order.id-generator.type",
+            havingValue = "fixed",
+            matchIfMissing = false
+    )
+    OrderIdGenerator fixedOrderIdGenerator(){
+        return generatorFacade.getFixedOrderIdGenerator();
+    }
+
+
 
     @Bean
     OrderFacade orderFacade(
         OrderRepository orderRepository,
-        RandomOrderIdGenerator orderIdGenerator,
+        OrderIdGenerator orderIdGenerator,
         PaymentClient paymentEventPublisher,
         OrderEventPublisher orderEventPublisher,
         Clock clock
