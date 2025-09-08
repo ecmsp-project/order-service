@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Clock;
-import java.util.UUID;
 
 @Configuration
 class OrderConfiguration {
@@ -13,13 +12,14 @@ class OrderConfiguration {
     @Bean
     OrderFacade orderFacade(
         OrderRepository orderRepository,
+        OrderIdGenerator orderIdGenerator,
         PaymentClient paymentEventPublisher,
         OrderEventPublisher orderEventPublisher,
         Clock clock
     ) {
         return new DefaultOrderFacade(
             /* orderRepository = */ orderRepository,
-            /* orderIdGenerator = */ () -> new OrderId(UUID.randomUUID()),
+            /* orderIdGenerator = */ orderIdGenerator,
             /* paymentEventPublisher = */ paymentEventPublisher,
             /* orderEventPublisher = */ orderEventPublisher,
             /* clock = */ clock

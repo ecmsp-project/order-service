@@ -26,6 +26,8 @@ order:
     type: kafka
   event-publisher:
     type: kafka
+  id-generator:
+    type: random
 
 kafka:
   topic:
@@ -34,3 +36,5 @@ kafka:
     payment-request: payment-request
     order-status-updated: order-status-updated
     cart-event: cart-event
+
+

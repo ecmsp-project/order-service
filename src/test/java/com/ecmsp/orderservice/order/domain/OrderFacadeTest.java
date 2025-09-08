@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class OrderFacadeTest {
 
+
     private static final OrderId ORDER_1_ID = new OrderId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
     private static final OrderId ORDER_2_ID = new OrderId(UUID.fromString("9e349a18-1203-4224-829c-dc15700c68a5"));
 
@@ -57,14 +58,15 @@ public class OrderFacadeTest {
         // given:
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(/* orders = */ Collections.emptyList()),
-                () -> ORDER_1_ID, // Mocking order ID generation
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
         // when:
-        Order createdOrder = facade.createOrder(new OrderToCreate(CLIENT_1_ID, ITEMS));
+
+        Order createdOrder = facade.createOrder(new OrderToCreate(CLIENT_1_ID, ITEMS), new Context(null));
 
         // then:
         assertThat(createdOrder).isEqualTo(
@@ -81,9 +83,10 @@ public class OrderFacadeTest {
     @Test
     void should_fail_when_create_order_with_existing_id() {
         // given:
+
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(List.of(ORDER_1)),
-                () -> ORDER_1_ID, // Mocking order ID generation,
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -92,7 +95,7 @@ public class OrderFacadeTest {
         // when:
         var error = assertThatThrownBy(() ->
                 // Trying to create an order with the same ID: ORDER_1_ID
-                facade.createOrder(new OrderToCreate(CLIENT_1_ID, ITEMS))
+                facade.createOrder(new OrderToCreate(CLIENT_1_ID, ITEMS), new Context(null))
         );
 
         // then:
@@ -102,10 +105,11 @@ public class OrderFacadeTest {
 
     @Test
     void should_update_order() {
+
         // given:
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(List.of(ORDER_1)),
-                () -> ORDER_1_ID, // Mocking order ID generation,
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -136,7 +140,7 @@ public class OrderFacadeTest {
         // given:
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(Collections.emptyList()), // No existing orders
-                () -> ORDER_1_ID, // Mocking order ID generation,
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -158,7 +162,7 @@ public class OrderFacadeTest {
         // given:
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(List.of(ORDER_1, ORDER_2)),
-                () -> ORDER_1_ID, // Mocking order ID generation,
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -176,7 +180,7 @@ public class OrderFacadeTest {
         // given:
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(List.of(ORDER_1, ORDER_2)),
-                () -> ORDER_1_ID, // Mocking order ID generation,
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -195,7 +199,7 @@ public class OrderFacadeTest {
         // given:
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(Collections.emptyList()), // No existing orders
-                () -> ORDER_1_ID, // Mocking order ID generation,
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -213,7 +217,7 @@ public class OrderFacadeTest {
         // given:
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(List.of(ORDER_1)),
-                () -> ORDER_1_ID, // Mocking order ID generation,
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -231,7 +235,7 @@ public class OrderFacadeTest {
         // given:
         OrderFacade facade = new DefaultOrderFacade(
                 new TestOrderRepository(Collections.emptyList()), // No existing orders
-                () -> ORDER_1_ID, // Mocking order ID generation,
+                (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)

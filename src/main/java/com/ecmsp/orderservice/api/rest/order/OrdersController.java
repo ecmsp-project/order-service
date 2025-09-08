@@ -42,15 +42,19 @@ public class OrdersController {
             .orElse(ResponseEntity.notFound().build());
     }
 
+
+
     @PostMapping
-    public ResponseEntity<OrderDetailsResponse> createOrder(@RequestBody CreateOrderRequest request) {
+    public ResponseEntity<OrderDetailsResponse> createOrder(@RequestBody CreateOrderRequest request, @RequestHeader(value = "X-Correlation-Id", required = false) String correlationId) {
+        Context context = new Context(new CorrelationId(UUID.fromString(correlationId)));
         OrderToCreate orderToCreate = new OrderToCreate(
             /* clientId = */ new ClientId(request.clientId()),
             /* items = */ request.items().stream()
                 .map(CreateOrderRequest.Item::toOrderItem)
                 .toList()
         );
-        Order order = orderFacade.createOrder(orderToCreate);
+
+        Order order = orderFacade.createOrder(orderToCreate, context);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.toOrderDetailsResponse(order));
     }
 

@@ -4,20 +4,18 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class DefaultOrderFacade implements OrderFacade {
 
     private final OrderRepository orderRepository;
-    private final Supplier<OrderId> orderIdGenerator;
+    private final OrderIdGenerator orderIdGenerator;
     private final PaymentClient paymentClient;
     private final OrderEventPublisher orderEventPublisher;
     private final Clock clock;
 
-
     public DefaultOrderFacade(
             OrderRepository orderRepository,
-            Supplier<OrderId> orderIdGenerator,
+            OrderIdGenerator orderIdGenerator,
             PaymentClient paymentEventPublisher,
             OrderEventPublisher orderEventPublisher,
             Clock clock
@@ -38,10 +36,10 @@ public class DefaultOrderFacade implements OrderFacade {
     }
 
 
-    public Order createOrder(OrderToCreate orderToCreate) {
+    public Order createOrder(OrderToCreate orderToCreate, Context context) {
 
         Order order = new Order(
-                /* orderId */ orderIdGenerator.get(),
+                /* orderId */ orderIdGenerator.generate(context.correlationId()),
                 /* clientId */ orderToCreate.clientId(),
                 /* orderStatus */ OrderStatus.PENDING, // Assuming default status is PENDING
                 /* date */ LocalDateTime.now(clock),
@@ -73,7 +71,6 @@ public class DefaultOrderFacade implements OrderFacade {
                 currentOrder.date(),
                 currentOrder.items()
         );
-
 
 
         orderRepository.update(updatedOrder);
