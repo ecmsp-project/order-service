@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-class OrderIdMappingService {
+public class OrderIdMappingService {
     private final Map<CorrelationId, OrderId> correlationToOrderIdMap = new ConcurrentHashMap<>();
 
     public Optional<OrderId> getOrderIdByCorrelation(CorrelationId correlationId) {
