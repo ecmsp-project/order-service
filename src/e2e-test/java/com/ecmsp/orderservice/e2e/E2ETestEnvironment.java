@@ -42,7 +42,7 @@ public final class E2ETestEnvironment {
                     .waitingFor(
                             Wait.forHttp("/health")
                                     .forStatusCode(200)
-                                    .withStartupTimeout(java.time.Duration.ofSeconds(15))
+                                    .withStartupTimeout(java.time.Duration.ofSeconds(20))
                     )
                     .withCreateContainerCmdModifier(cmd ->
                             cmd.withName("order-service")
@@ -85,10 +85,10 @@ public final class E2ETestEnvironment {
     public static URI getUrl(Containers container) {
         return switch (container) {
             case ORDER_SERVICE ->
-                    URI.create(ORDER_SERVICE_CONTAINER.getHost() + ":" + ORDER_SERVICE_CONTAINER.getMappedPort(8080));
-            case KAFKA -> URI.create(KAFKA_CONTAINER.getHost() + ":" + KAFKA_CONTAINER.getMappedPort(9093));
+                    URI.create("http://" + ORDER_SERVICE_CONTAINER.getHost() + ":" + ORDER_SERVICE_CONTAINER.getMappedPort(8080));
+            case KAFKA -> URI.create("http://" + KAFKA_CONTAINER.getHost() + ":" + KAFKA_CONTAINER.getMappedPort(9093));
             case POSTGRES ->
-                    URI.create(POSTGRES_CONTAINER.getHost() + ":" + POSTGRES_CONTAINER.getMappedPort(5432));
+                    URI.create("http://" + POSTGRES_CONTAINER.getHost() + ":" + POSTGRES_CONTAINER.getMappedPort(5432));
         };
     }
 

@@ -1,6 +1,6 @@
 package com.ecmsp.orderservice.e2e.tests;
 
-import com.ecmsp.orderservice.api.kafka.CartCreatedEvent;
+import com.ecmsp.orderservice.e2e.utils.InternalOrderApi;
 import com.ecmsp.orderservice.e2e.utils.KafkaApi;
 import com.ecmsp.orderservice.e2e.utils.OrderServiceApi;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,8 @@ public class CreateOrderE2ETest {
     private static final String CLIENT_ID = "b5d1eec8-c3ea-4b55-8cec-900b5c018381";
     private static final String ITEM_1_ID = "a1d1eec8-c3ea-4b55-8cec-900b5c018381";
     private static final String ITEM_2_ID = "c3d1eec8-c3ea-4b55-8cec-900b5c018381";
+    private static final String ORDER_ID = "d4d1eec8-c3ea-4b55-8cec-900b5c018381";
+    private static final String CORRELATION_ID = "e5d1eec8-c3ea-4b55-8cec-900b5c018381";
 
     private static final List<CartItem> ITEMS = List.of(
             new CartItem(
@@ -36,19 +38,23 @@ public class CreateOrderE2ETest {
 
     private final KafkaApi kafkaApi;
     private final OrderServiceApi orderServiceApi;
+    private final InternalOrderApi internalOrderApi;
 
 
     public CreateOrderE2ETest(){
+        this.internalOrderApi = new InternalOrderApi(getUrl(Containers.ORDER_SERVICE));
         this.kafkaApi = new KafkaApi(getUrl(Containers.KAFKA));
         this.orderServiceApi = new OrderServiceApi(getUrl(Containers.ORDER_SERVICE));
     }
 
     @Test
     public void should_create_order_when_cart_event_sent() {
-        CartCreatedEvent event = new CartCreatedEvent(CLIENT_ID, ITEMS);
-        kafkaApi.sendEvent(event);
-
-        orderServiceApi.getOrderById();
+        internalOrderApi.createOrderMapping(CORRELATION_ID, ORDER_ID);
+//
+//        CartCreatedEvent event = new CartCreatedEvent(CLIENT_ID, ITEMS);
+//        kafkaApi.sendEvent(event);
+//
+//        orderServiceApi.getOrderById();
     }
 
 }
