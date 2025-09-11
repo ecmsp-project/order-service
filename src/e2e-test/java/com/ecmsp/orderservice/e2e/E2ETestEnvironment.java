@@ -1,5 +1,8 @@
 package com.ecmsp.orderservice.e2e;
 
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -29,8 +32,21 @@ public final class E2ETestEnvironment {
                     .withNetwork(NETWORK)
                     .withExposedPorts(9092, 9093)
                     .withCreateContainerCmdModifier(cmd ->
-                            cmd.withName("kafka")
+                            cmd
+                                    .withName("kafka")
+                                    .getHostConfig().withPortBindings(
+                                            // set fixed port on localhost to 9092
+                                            new PortBinding(
+                                                    /* hostPort = */ Ports.Binding.bindPort(9092),
+                                                    /* containerPort = */ new ExposedPort(9092)
+                                            ),
+                                            new PortBinding(
+                                                    /* hostPort = */ Ports.Binding.bindPort(9093),
+                                                    /* containerPort = */ new ExposedPort(9093)
+                                            )
+                                    )
                     );
+
 
     private static final GenericContainer<?> ORDER_SERVICE_CONTAINER =
             new GenericContainer<>(
@@ -45,7 +61,15 @@ public final class E2ETestEnvironment {
                                     .withStartupTimeout(java.time.Duration.ofSeconds(20))
                     )
                     .withCreateContainerCmdModifier(cmd ->
-                            cmd.withName("order-service")
+                            cmd
+                                    .withName("order-service")
+                                    .getHostConfig().withPortBindings(
+                                            // set fixed port on localhost to 8080
+                                            new PortBinding(
+                                                    /* hostPort = */ Ports.Binding.bindPort(8080),
+                                                    /* containerPort = */ new ExposedPort(8080)
+                                            )
+                                    )
                     )
                     .withNetwork(NETWORK)
                     .dependsOn(KAFKA_CONTAINER)

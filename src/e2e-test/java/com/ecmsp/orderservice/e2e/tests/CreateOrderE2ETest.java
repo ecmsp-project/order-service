@@ -1,5 +1,8 @@
 package com.ecmsp.orderservice.e2e.tests;
 
+import com.ecmsp.order.v1.GetOrderResponse;
+import com.ecmsp.order.v1.OrderItemDetails;
+import com.ecmsp.orderservice.api.kafka.CartCreatedEvent;
 import com.ecmsp.orderservice.e2e.utils.InternalOrderApi;
 import com.ecmsp.orderservice.e2e.utils.KafkaApi;
 import com.ecmsp.orderservice.e2e.utils.OrderServiceApi;
@@ -10,6 +13,8 @@ import java.util.List;
 import static com.ecmsp.orderservice.api.kafka.CartCreatedEvent.CartItem;
 import static com.ecmsp.orderservice.e2e.E2ETestEnvironment.Containers;
 import static com.ecmsp.orderservice.e2e.E2ETestEnvironment.getUrl;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class CreateOrderE2ETest {
 
@@ -21,18 +26,18 @@ public class CreateOrderE2ETest {
 
     private static final List<CartItem> ITEMS = List.of(
             new CartItem(
-                ITEM_1_ID,
-                "Item 1",
-                new java.math.BigDecimal("10.00"),
-                2,
-                "Description for Item 1"
+                    ITEM_1_ID,
+                    "Item 1",
+                    new java.math.BigDecimal("10.00"),
+                    2,
+                    "Description for Item 1"
             ),
             new CartItem(
-                ITEM_2_ID,
-                "Item 2",
-                new java.math.BigDecimal("20.00"),
-                1,
-                "Description for Item 2"
+                    ITEM_2_ID,
+                    "Item 2",
+                    new java.math.BigDecimal("20.00"),
+                    1,
+                    "Description for Item 2"
             )
     );
 
@@ -41,7 +46,7 @@ public class CreateOrderE2ETest {
     private final InternalOrderApi internalOrderApi;
 
 
-    public CreateOrderE2ETest(){
+    public CreateOrderE2ETest() {
         this.internalOrderApi = new InternalOrderApi(getUrl(Containers.ORDER_SERVICE));
         this.kafkaApi = new KafkaApi(getUrl(Containers.KAFKA));
         this.orderServiceApi = new OrderServiceApi(getUrl(Containers.ORDER_SERVICE));
@@ -49,12 +54,22 @@ public class CreateOrderE2ETest {
 
     @Test
     public void should_create_order_when_cart_event_sent() {
+
         internalOrderApi.createOrderMapping(CORRELATION_ID, ORDER_ID);
-//
-//        CartCreatedEvent event = new CartCreatedEvent(CLIENT_ID, ITEMS);
-//        kafkaApi.sendEvent(event);
-//
-//        orderServiceApi.getOrderById();
+        CartCreatedEvent event = new CartCreatedEvent(CLIENT_ID, ITEMS);
+        kafkaApi.sendEvent(event, CORRELATION_ID);
+        GetOrderResponse orderResponse = orderServiceApi.getOrderById(ORDER_ID);
+
+        assertThat(orderResponse.getItemsList()).containsExactly(
+                OrderItemDetails.newBuilder()
+                        .setItemId(ITEM_1_ID)
+                        .setQuantity(2)
+                        .build(),
+                OrderItemDetails.newBuilder()
+                        .setItemId(ITEM_2_ID)
+                        .setQuantity(1)
+                        .build()
+                );
     }
 
 }
