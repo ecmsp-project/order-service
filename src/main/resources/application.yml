@@ -21,7 +21,11 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     bootstrap-servers: ${KAFKA_URL}
-
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  profiles:
+    active: dev
 
 order:
   repository:
