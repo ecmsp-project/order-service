@@ -20,7 +20,8 @@ public record CartCreatedEvent(
         String name,
         BigDecimal price,
         int quantity,
-        String description
+        String description,
+        boolean isReturnable
     ) {
     }
 
@@ -31,7 +32,8 @@ public record CartCreatedEvent(
                 .map(cartItem -> new OrderItem(
                         new ItemId(cartItem.itemId()),
                         cartItem.quantity(),
-                        cartItem.price()
+                        cartItem.price(),
+                        cartItem.isReturnable()
                 )).toList()
         );
     }

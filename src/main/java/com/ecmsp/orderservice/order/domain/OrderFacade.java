@@ -15,6 +15,8 @@ public interface OrderFacade {
 
     void deleteOrder(OrderId orderId);
 
+    boolean canOrderBeReturned(OrderId orderId);
 
+    List<OrderItem> getReturnableItems(OrderId orderId);
 
 }

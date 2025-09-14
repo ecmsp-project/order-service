@@ -2,6 +2,7 @@ package com.ecmsp.orderservice.api.rest.order;
 
 import com.ecmsp.orderservice.api.rest.order.dto.CreateOrderRequest;
 import com.ecmsp.orderservice.api.rest.order.dto.OrderDetailsResponse;
+import com.ecmsp.orderservice.api.rest.order.dto.OrderReturnabilityResponse;
 import com.ecmsp.orderservice.api.rest.order.dto.UpdateOrderRequest;
 import com.ecmsp.orderservice.order.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,21 @@ public class OrdersController {
     public ResponseEntity<Void> deleteOrder(@PathVariable("orderId") UUID orderId) {
         orderFacade.deleteOrder(new OrderId(orderId));
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{orderId}/returnability")
+    public ResponseEntity<OrderReturnabilityResponse> getOrderReturnability(@PathVariable UUID orderId) {
+        Optional<Order> order = orderFacade.findOrderById(new OrderId(orderId));
+
+        return order.map(orderMapper::toOrderReturnabilityResponse)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{orderId}/returnable")
+    public ResponseEntity<Boolean> canOrderBeReturned(@PathVariable UUID orderId) {
+        boolean canBeReturned = orderFacade.canOrderBeReturned(new OrderId(orderId));
+        return ResponseEntity.ok(canBeReturned);
     }
 
     // TODO: Replace with query params in GET /api/orders

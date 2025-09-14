@@ -16,10 +16,11 @@ public record CreateOrderRequest(
     public record Item(
             UUID itemId,
             int quantity,
-            double price
+            double price,
+            boolean returnable
     ) {
         public OrderItem toOrderItem() {
-            return new OrderItem(new ItemId(itemId), quantity, BigDecimal.valueOf(price));
+            return new OrderItem(new ItemId(itemId), quantity, BigDecimal.valueOf(price), returnable);
         }
     }
 

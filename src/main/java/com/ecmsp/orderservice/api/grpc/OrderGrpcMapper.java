@@ -121,7 +121,8 @@ public class OrderGrpcMapper {
         return new OrderItem(
                 new ItemId(UUID.fromString(item.getItemId())),
                 item.getQuantity(),
-                BigDecimal.valueOf(item.getPrice())
+                BigDecimal.valueOf(item.getPrice()),
+                true // Default to returnable for items created via gRPC
         );
     }
 

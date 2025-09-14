@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public record OrderItem(
     ItemId itemId,
     int quantity,
-    BigDecimal priceAtTimeOfOrder
+    BigDecimal priceAtTimeOfOrder,
+    boolean isReturnable
 ) {
 }

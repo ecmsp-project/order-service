@@ -11,7 +11,7 @@ class OrderEntityMapper {
             /* orderStatus = */ orderEntity.getOrderStatus(),
             /* date = */ orderEntity.getDate(),
             /* items = */ orderEntity.getItems().stream()
-            .map(item -> new OrderItem( new ItemId(item.getItemId()), item.getQuantity(), item.getPrice()))
+            .map(item -> new OrderItem( new ItemId(item.getItemId()), item.getQuantity(), item.getPrice(), item.getIsReturnable()))
             .toList()
         );
     }

@@ -37,6 +37,11 @@ class OrderItemEntity {
     private String description;
 
 
+    // set on database migration
+    @Column(name = "is_returnable", nullable = false)
+    private Boolean isReturnable;
+
+
     public UUID getItemId() {
         return itemId;
     }
@@ -83,5 +88,13 @@ class OrderItemEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getIsReturnable() {
+        return isReturnable;
+    }
+
+    public void setIsReturnable(Boolean isReturnable) {
+        this.isReturnable = isReturnable;
     }
 }
