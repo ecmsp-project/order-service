@@ -38,15 +38,4 @@ public class LocalPostgreSQLConfiguration {
                 .withPassword("admin");
     }
 
-//    @Bean
-//    @DependsOn("postgresContainer")
-//    public Flyway flyway(DataSource dataSource) {
-//        Flyway flyway = Flyway.configure()
-//                .dataSource(dataSource)
-//                .locations("classpath:db/migration")
-//                .baselineOnMigrate(true)
-//                .load();
-//        flyway.migrate();
-//        return flyway;
-//    }
 }

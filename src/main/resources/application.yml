@@ -2,7 +2,7 @@ spring:
   application:
     name: Order service
   jpa:
-    hibernate.ddl-auto: create # TODO: set to none once flyway integration is finished
+    hibernate.ddl-auto: none # TODO: set to none once flyway integration is finished
     properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   datasource:
@@ -29,8 +29,7 @@ spring:
     server:
       port: 9090
       address: 0.0.0.0
-#  profiles:
-#    active: dev
+
 
 order:
   repository:

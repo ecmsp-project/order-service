@@ -1,12 +1,15 @@
 spring:
   kafka:
     bootstrap-servers: localhost:9092
-#  flyway:
-#    enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order-service-db
+    username: admin
+    password: admin
+
 
 order:
   repository:
-    type: in-memory
+    type: db
   payment-client:
     type: in-memory
   event-publisher:
