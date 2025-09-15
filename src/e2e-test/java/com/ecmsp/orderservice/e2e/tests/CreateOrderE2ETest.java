@@ -11,8 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.ecmsp.orderservice.api.kafka.CartCreatedEvent.CartItem;
-import static com.ecmsp.orderservice.e2e.E2ETestEnvironment.Containers;
-import static com.ecmsp.orderservice.e2e.E2ETestEnvironment.getUrl;
+import static com.ecmsp.orderservice.e2e.E2ETestEnvironment.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -47,17 +46,18 @@ public class CreateOrderE2ETest {
 
 
     public CreateOrderE2ETest() {
-        this.internalOrderApi = new InternalOrderApi(getUrl(Containers.ORDER_SERVICE));
-        this.kafkaApi = new KafkaApi(getUrl(Containers.KAFKA));
-        this.orderServiceApi = new OrderServiceApi(getUrl(Containers.ORDER_SERVICE));
+        this.internalOrderApi = new InternalOrderApi(orderServiceRestUrl());
+        this.kafkaApi = new KafkaApi(kafkaBootstrapServers());
+        this.orderServiceApi = new OrderServiceApi(orderServiceGrpcUrl());
     }
 
     @Test
-    public void should_create_order_when_cart_event_sent() {
+    public void should_create_order_when_cart_event_sent() throws InterruptedException {
 
         internalOrderApi.createOrderMapping(CORRELATION_ID, ORDER_ID);
         CartCreatedEvent event = new CartCreatedEvent(CLIENT_ID, ITEMS);
         kafkaApi.sendEvent(event, CORRELATION_ID);
+        Thread.sleep(10000); // TODO: use retryable mechanism here
         GetOrderResponse orderResponse = orderServiceApi.getOrderById(ORDER_ID);
 
         assertThat(orderResponse.getItemsList()).containsExactly(

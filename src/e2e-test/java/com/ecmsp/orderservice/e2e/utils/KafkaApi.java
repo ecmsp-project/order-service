@@ -22,14 +22,14 @@ public class KafkaApi {
     private final ObjectMapper objectMapper;
 
 
-    public KafkaApi(URI uri) {
+    public KafkaApi(String bootstrapServers) {
         this.objectMapper = new ObjectMapper();
-        this.producer = createProducer(uri);
+        this.producer = createProducer(bootstrapServers);
     }
 
-    private KafkaProducer<String, String> createProducer(URI uri) {
+    private KafkaProducer<String, String> createProducer(String bootstrapServers) {
         var props = new java.util.Properties();
-        props.put("bootstrap.servers", "localhost:9093");
+        props.put("bootstrap.servers", bootstrapServers);
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         return new KafkaProducer<>(props);
@@ -41,7 +41,7 @@ public class KafkaApi {
             String eventJson = objectMapper.writeValueAsString(event);
             sendEvent("cart-event", String.valueOf(UUID.randomUUID()), eventJson, List.of(
                     new RecordHeader("__TypeId__", CartCreatedEvent.class.getCanonicalName().getBytes()),
-                    new RecordHeader("correlationId", correlationId.getBytes())
+                    new RecordHeader("X-Correlation-Id", correlationId.getBytes())
             ));
             System.out.println("Sent CartCreatedEvent: " + eventJson);
         } catch (JsonProcessingException e) {

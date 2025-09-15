@@ -2,7 +2,7 @@ spring:
   application:
     name: Order service
   jpa:
-    hibernate.ddl-auto: none
+    hibernate.ddl-auto: create # TODO: set to none once flyway integration is finished
     properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   datasource:
@@ -19,10 +19,8 @@ spring:
         spring.json.trusted.packages: '*'
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     bootstrap-servers: ${KAFKA_URL}
-  profiles:
-    active: dev
 
 
 order:
@@ -43,4 +41,8 @@ kafka:
     order-status-updated: order-status-updated
     cart-event: cart-event
 
-
+grpc:
+  server:
+    port: 9090
+    security:
+      enabled: false # Set to true to enable TLS
