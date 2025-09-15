@@ -5,7 +5,7 @@
 ### PostgreSQL Container Management
 ```bash
 # Start PostgreSQL container for order-service
-docker run -d --name order-service-postgres \
+docker run -d --name order-service-db \
   -e POSTGRES_USER=admin \
   -e POSTGRES_PASSWORD=admin \
   -e POSTGRES_DB=order-service-db \
@@ -15,33 +15,33 @@ docker run -d --name order-service-postgres \
 docker ps
 
 # Check if PostgreSQL container is running
-docker ps | grep order-service-postgres
+docker ps | grep order-service-db
 
 # Stop PostgreSQL container
-docker stop order-service-postgres
+docker stop order-service-db
 
 # Remove PostgreSQL container
-docker rm order-service-postgres
+docker rm order-service-db
 ```
 
 ### Database Access
 ```bash
 # Connect to PostgreSQL database
-docker exec -it order-service-postgres psql -U admin -d order-service-db
+docker exec -it order-service-db psql -U admin -d order-service-db
 
 # List tables
-docker exec order-service-postgres psql -U admin -d order-service-db -c "\dt"
+docker exec order-service-db psql -U admin -d order-service-db -c "\dt"
 
 # Show table structure
-docker exec order-service-postgres psql -U admin -d order-service-db -c "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public' ORDER BY table_name, ordinal_position;"
+docker exec order-service-db psql -U admin -d order-service-db -c "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public' ORDER BY table_name, ordinal_position;"
 
 # Count records in tables
-docker exec order-service-postgres psql -U admin -d order-service-db -c "SELECT COUNT(*) as order_count FROM orders;"
-docker exec order-service-postgres psql -U admin -d order-service-db -c "SELECT COUNT(*) as order_item_count FROM order_item;"
+docker exec order-service-db psql -U admin -d order-service-db -c "SELECT COUNT(*) as order_count FROM orders;"
+docker exec order-service-db psql -U admin -d order-service-db -c "SELECT COUNT(*) as order_item_count FROM order_item;"
 
 # View sample data
-docker exec order-service-postgres psql -U admin -d order-service-db -c "SELECT * FROM orders LIMIT 5;"
-docker exec order-service-postgres psql -U admin -d order-service-db -c "SELECT * FROM order_item LIMIT 5;"
+docker exec order-service-db psql -U admin -d order-service-db -c "SELECT * FROM orders LIMIT 5;"
+docker exec order-service-db psql -U admin -d order-service-db -c "SELECT * FROM order_item LIMIT 5;"
 ```
 
 ## Flyway Commands
@@ -138,10 +138,10 @@ tree src/main/resources/
 ### Connection Issues
 ```bash
 # Test PostgreSQL connection
-docker exec order-service-postgres pg_isready -U admin
+docker exec order-service-db pg_isready -U admin
 
 # Check PostgreSQL logs
-docker logs order-service-postgres
+docker logs order-service-db
 
 # Check if port 5432 is in use
 netstat -tlnp | grep 5432

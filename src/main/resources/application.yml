@@ -24,12 +24,13 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    baseline-on-migrate: true
   grpc:
     server:
       port: 9090
       address: 0.0.0.0
-  profiles:
-    active: dev
+#  profiles:
+#    active: dev
 
 order:
   repository:
