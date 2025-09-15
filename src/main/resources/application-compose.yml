@@ -1,6 +1,7 @@
 spring:
   datasource:
-    url: jdbc:postgresql://order-service-db:5432/order-service-db
+    # docker-compose expose on the host machine 5440 port
+    url: jdbc:postgresql://order-service-db:5440/order-service-db
 
   kafka:
     bootstrap-servers: kafka:9092
