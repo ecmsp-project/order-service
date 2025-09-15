@@ -2,6 +2,8 @@ package com.ecmsp.orderservice.order.adapter.repository.db;
 
 import com.ecmsp.orderservice.order.domain.*;
 
+import java.util.List;
+
 class OrderEntityMapper {
 
     public Order toOrder(OrderEntity orderEntity) {
@@ -17,18 +19,25 @@ class OrderEntityMapper {
     }
 
     public OrderEntity toOrderEntity(Order order) {
-        return OrderEntity.builder()
+        OrderEntity orderEntity = OrderEntity.builder()
             .orderId(order.orderId().value())
             .clientId(order.clientId().value())
             .orderStatus(order.orderStatus())
             .date(order.date())
-            .items(order.items().stream()
-                .map(item -> OrderItemEntity.builder()
-                    .itemId(item.itemId().value())
-                    .quantity(item.quantity())
-                    .build())
-                .toList())
             .build();
+
+        List<OrderItemEntity> itemEntities = order.items().stream()
+            .map(item -> OrderItemEntity.builder()
+                .itemId(item.itemId().value())
+                .quantity(item.quantity())
+                .price(item.priceAtTimeOfOrder())
+                .build())
+            .toList();
+
+        itemEntities.forEach(itemEntity -> itemEntity.setOrder(orderEntity));
+        orderEntity.setItems(itemEntities);
+
+        return orderEntity;
     }
 
 }
