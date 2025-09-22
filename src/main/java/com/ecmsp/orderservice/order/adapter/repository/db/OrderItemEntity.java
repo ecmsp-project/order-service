@@ -33,6 +33,11 @@ class OrderItemEntity {
     private BigDecimal price;
 
 
+    // set on database migration
+    @Column(name = "is_returnable", nullable = false)
+    private Boolean isReturnable;
+
+
     public UUID getItemId() {
         return itemId;
     }
@@ -63,6 +68,22 @@ class OrderItemEntity {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getIsReturnable() {
+        return isReturnable;
+    }
+
+    public void setIsReturnable(Boolean isReturnable) {
+        this.isReturnable = isReturnable;
     }
 
 }

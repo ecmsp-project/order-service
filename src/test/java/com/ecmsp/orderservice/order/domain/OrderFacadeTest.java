@@ -24,12 +24,14 @@ public class OrderFacadeTest {
             new OrderItem(
                     /* itemId = */ new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
                     /* quantity = */ 2,
-                    /* price = */ BigDecimal.valueOf(10)
+                    /* price = */ BigDecimal.valueOf(10),
+                    /* isReturnable = */ true
             ),
             new OrderItem(
                     /* itemId = */ new ItemId(UUID.fromString("473c1579-12b1-49b0-b90e-253782c874a5")),
                     /* quantity = */ 1,
-                    /* price = */ BigDecimal.valueOf(20)
+                    /* price = */ BigDecimal.valueOf(20),
+                    /* isReturnable = */ false
             )
     );
 
@@ -56,11 +58,13 @@ public class OrderFacadeTest {
     @Test
     void should_create_order() {
         // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(/* orders = */ Collections.emptyList());
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(/* orders = */ Collections.emptyList()),
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -84,11 +88,13 @@ public class OrderFacadeTest {
     void should_fail_when_create_order_with_existing_id() {
         // given:
 
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(ORDER_1));
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(List.of(ORDER_1)),
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -107,11 +113,13 @@ public class OrderFacadeTest {
     void should_update_order() {
 
         // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(ORDER_1));
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(List.of(ORDER_1)),
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -138,11 +146,13 @@ public class OrderFacadeTest {
     @Test
     void should_fail_when_update_order_with_non_existing_id() {
         // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(Collections.emptyList()); // No existing orders
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(Collections.emptyList()), // No existing orders
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -160,11 +170,13 @@ public class OrderFacadeTest {
     @Test
     void should_list_all_orders() {
         // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(ORDER_1, ORDER_2));
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(List.of(ORDER_1, ORDER_2)),
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -178,11 +190,13 @@ public class OrderFacadeTest {
     @Test
     void should_find_order_by_id() {
         // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(ORDER_1, ORDER_2));
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(List.of(ORDER_1, ORDER_2)),
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -197,11 +211,13 @@ public class OrderFacadeTest {
     @Test
     void should_not_find_order_when_id_does_not_exist() {
         // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(Collections.emptyList()); // No existing orders
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(Collections.emptyList()), // No existing orders
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -215,11 +231,13 @@ public class OrderFacadeTest {
     @Test
     void should_delete_order() {
         // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(ORDER_1));
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(List.of(ORDER_1)),
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -233,11 +251,13 @@ public class OrderFacadeTest {
     @Test
     void should_do_nothing_when_delete_non_existing_order() {
         // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(Collections.emptyList()); // No existing orders
         OrderFacade facade = new DefaultOrderFacade(
-                new TestOrderRepository(Collections.emptyList()), // No existing orders
+                orderRepository,
                 (correlationId) -> ORDER_1_ID,
                 new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -246,6 +266,204 @@ public class OrderFacadeTest {
 
         // then:
         assertThat(facade.findOrderById(ORDER_1_ID)).isNotPresent();
+    }
+
+    @Test
+    void should_return_true_when_order_is_returnable() {
+        // given:
+        LocalDateTime recentDate = LocalDateTime.now().minusDays(7); // 7 days ago
+        List<OrderItem> returnableItems = List.of(
+                new OrderItem(
+                        new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                        2,
+                        BigDecimal.valueOf(10),
+                        true
+                )
+        );
+        Order returnableOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, recentDate, returnableItems);
+
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(returnableOrder));
+        OrderFacade facade = new DefaultOrderFacade(
+                orderRepository,
+                (correlationId) -> ORDER_1_ID,
+                new TestPaymentEventPublisher(),
+                new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
+                Clock.systemDefaultZone()
+        );
+
+        // when:
+        boolean canBeReturned = facade.canOrderBeReturned(ORDER_1_ID);
+
+        // then:
+        assertThat(canBeReturned).isTrue();
+    }
+
+    @Test
+    void should_return_false_when_order_is_too_old() {
+        // given:
+        LocalDateTime oldDate = LocalDateTime.now().minusDays(20); // 20 days ago (beyond 14-day limit)
+        List<OrderItem> returnableItems = List.of(
+                new OrderItem(
+                        new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                        2,
+                        BigDecimal.valueOf(10),
+                        true
+                )
+        );
+        Order oldOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, oldDate, returnableItems);
+
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(oldOrder));
+        OrderFacade facade = new DefaultOrderFacade(
+                orderRepository,
+                (correlationId) -> ORDER_1_ID,
+                new TestPaymentEventPublisher(),
+                new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
+                Clock.systemDefaultZone()
+        );
+
+        // when:
+        boolean canBeReturned = facade.canOrderBeReturned(ORDER_1_ID);
+
+        // then:
+        assertThat(canBeReturned).isFalse();
+    }
+
+    @Test
+    void should_return_false_when_no_items_are_returnable() {
+        // given:
+        LocalDateTime recentDate = LocalDateTime.now().minusDays(7); // 7 days ago
+        List<OrderItem> nonReturnableItems = List.of(
+                new OrderItem(
+                        new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                        2,
+                        BigDecimal.valueOf(10),
+                        false // not returnable
+                )
+        );
+        Order nonReturnableOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, recentDate, nonReturnableItems);
+
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(nonReturnableOrder));
+        OrderFacade facade = new DefaultOrderFacade(
+                orderRepository,
+                (correlationId) -> ORDER_1_ID,
+                new TestPaymentEventPublisher(),
+                new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
+                Clock.systemDefaultZone()
+        );
+
+        // when:
+        boolean canBeReturned = facade.canOrderBeReturned(ORDER_1_ID);
+
+        // then:
+        assertThat(canBeReturned).isFalse();
+    }
+
+    @Test
+    void should_return_only_returnable_items_within_return_period() {
+        // given:
+        LocalDateTime recentDate = LocalDateTime.now().minusDays(7); // 7 days ago
+        OrderItem returnableItem = new OrderItem(
+                new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                2,
+                BigDecimal.valueOf(10),
+                true
+        );
+        OrderItem nonReturnableItem = new OrderItem(
+                new ItemId(UUID.fromString("473c1579-12b1-49b0-b90e-253782c874a5")),
+                1,
+                BigDecimal.valueOf(20),
+                false
+        );
+        List<OrderItem> mixedItems = List.of(returnableItem, nonReturnableItem);
+        Order mixedOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, recentDate, mixedItems);
+
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(mixedOrder));
+        OrderFacade facade = new DefaultOrderFacade(
+                orderRepository,
+                (correlationId) -> ORDER_1_ID,
+                new TestPaymentEventPublisher(),
+                new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
+                Clock.systemDefaultZone()
+        );
+
+        // when:
+        List<OrderItem> returnableItems = facade.getReturnableItems(ORDER_1_ID);
+
+        // then:
+        assertThat(returnableItems).containsExactly(returnableItem);
+    }
+
+    @Test
+    void should_return_empty_list_when_order_is_outside_return_period() {
+        // given:
+        LocalDateTime oldDate = LocalDateTime.now().minusDays(20); // 20 days ago
+        OrderItem returnableItem = new OrderItem(
+                new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                2,
+                BigDecimal.valueOf(10),
+                true
+        );
+        Order oldOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, oldDate, List.of(returnableItem));
+
+        TestOrderRepository orderRepository = new TestOrderRepository(List.of(oldOrder));
+        OrderFacade facade = new DefaultOrderFacade(
+                orderRepository,
+                (correlationId) -> ORDER_1_ID,
+                new TestPaymentEventPublisher(),
+                new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
+                Clock.systemDefaultZone()
+        );
+
+        // when:
+        List<OrderItem> returnableItems = facade.getReturnableItems(ORDER_1_ID);
+
+        // then:
+        assertThat(returnableItems).isEmpty();
+    }
+
+    @Test
+    void should_return_false_when_order_does_not_exist_for_return_check() {
+        // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(Collections.emptyList());
+        OrderFacade facade = new DefaultOrderFacade(
+                orderRepository,
+                (correlationId) -> ORDER_1_ID,
+                new TestPaymentEventPublisher(),
+                new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
+                Clock.systemDefaultZone()
+        );
+
+        // when:
+        boolean canBeReturned = facade.canOrderBeReturned(ORDER_1_ID);
+
+        // then:
+        assertThat(canBeReturned).isFalse();
+    }
+
+    @Test
+    void should_return_empty_list_when_order_does_not_exist_for_returnable_items() {
+        // given:
+        TestOrderRepository orderRepository = new TestOrderRepository(Collections.emptyList());
+        OrderFacade facade = new DefaultOrderFacade(
+                orderRepository,
+                (correlationId) -> ORDER_1_ID,
+                new TestPaymentEventPublisher(),
+                new TestOrderEventPublisher(),
+                new OrderReturnService(orderRepository),
+                Clock.systemDefaultZone()
+        );
+
+        // when:
+        List<OrderItem> returnableItems = facade.getReturnableItems(ORDER_1_ID);
+
+        // then:
+        assertThat(returnableItems).isEmpty();
     }
 
 }
