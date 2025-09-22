@@ -11,12 +11,12 @@ import java.util.UUID;
 
 
 public record CartCreatedEvent(
-        UUID clientId,
+        String clientId,
         List<CartItem> items
 ) {
 
     public record CartItem(
-        UUID itemId,
+        String itemId,
         String name,
         BigDecimal price,
         int quantity,
@@ -27,10 +27,10 @@ public record CartCreatedEvent(
 
     public static OrderToCreate toOrder(CartCreatedEvent cartEvent) {
         return new OrderToCreate(
-                /* clientId */ new ClientId(cartEvent.clientId()),
+                /* clientId */ new ClientId(UUID.fromString(cartEvent.clientId())),
                 /* items */ cartEvent.items().stream()
                 .map(cartItem -> new OrderItem(
-                        new ItemId(cartItem.itemId()),
+                        new ItemId(UUID.fromString(cartItem.itemId())),
                         cartItem.quantity(),
                         cartItem.price(),
                         cartItem.isReturnable()

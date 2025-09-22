@@ -17,6 +17,8 @@ class OrderItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID orderItemId;
+
     @Column(name = "item_id")
     private UUID itemId;
 
@@ -24,17 +26,11 @@ class OrderItemEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 
-    @Column(name = "item_name", nullable = false)
-    private String itemName;
-
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
     @Column(name = "price", nullable = false)
     private BigDecimal price;
-
-    @Column(name = "description")
-    private String description;
 
 
     // set on database migration
@@ -56,14 +52,6 @@ class OrderItemEntity {
 
     public void setOrder(OrderEntity order) {
         this.order = order;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
     }
 
     public Integer getQuantity() {
@@ -97,4 +85,5 @@ class OrderItemEntity {
     public void setIsReturnable(Boolean isReturnable) {
         this.isReturnable = isReturnable;
     }
+
 }

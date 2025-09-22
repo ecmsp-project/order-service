@@ -4,6 +4,7 @@ import com.ecmsp.orderservice.order.domain.Order;
 import com.ecmsp.orderservice.order.domain.OrderException;
 import com.ecmsp.orderservice.order.domain.OrderId;
 import com.ecmsp.orderservice.order.domain.OrderRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ class DbOrderRepository implements OrderRepository {
     }
 
     @Override
+    @Transactional
     public Optional<Order> findById(OrderId orderId) {
         return orderEntityRepository.findById(orderId.value())
             .map(orderEntityMapper::toOrder);
