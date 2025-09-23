@@ -28,6 +28,7 @@ public class OrdersController {
         this.orderMapper = new OrderControllerMapper();
     }
 
+
     @GetMapping
     public ResponseEntity<List<OrderDetailsResponse>> listOrders() {
         List<Order> orders = orderFacade.getAllOrders();
@@ -96,26 +97,6 @@ public class OrdersController {
         return ResponseEntity.ok(canBeReturned);
     }
 
-    // TODO: Replace with query params in GET /api/orders
-//    @GetMapping("/client/{clientId}")
-//    public ResponseEntity<List<OrderEntity>> getOrdersByClientId(@PathVariable UUID clientId) {
-//        List<OrderEntity> orders = orderService.getOrdersByClientId(clientId);
-//        return ResponseEntity.ok(orders);
-//    }
 
-    // TODO: Replace with query params in GET /api/orders
-//    @GetMapping("/today")
-//    public ResponseEntity<List<OrderEntity>> getTodayOrders() {
-//        List<OrderEntity> orders = orderService.getTodayOrders();
-//        return ResponseEntity.ok(orders);
-//    }
-
-
-    // TODO: Replace with query params in GET /api/orders
-//    @GetMapping("/count/{status}")
-//    public ResponseEntity<Long> countOrdersByStatus(@PathVariable OrderStatus status) {
-//        long count = orderService.countOrdersByStatus(status);
-//        return ResponseEntity.ok(count);
-//    }
 
 }

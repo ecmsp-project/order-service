@@ -29,14 +29,16 @@ public class CreateOrderE2ETest {
                     "Item 1",
                     new java.math.BigDecimal("10.00"),
                     2,
-                    "Description for Item 1"
+                    "Description for Item 1",
+                    false
             ),
             new CartItem(
                     ITEM_2_ID,
                     "Item 2",
                     new java.math.BigDecimal("20.00"),
                     1,
-                    "Description for Item 2"
+                    "Description for Item 2",
+                    true
             )
     );
 
