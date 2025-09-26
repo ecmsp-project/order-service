@@ -54,3 +54,4 @@ grpc:
     port: 9090
     security:
       enabled: false # Set to true to enable TLS
+

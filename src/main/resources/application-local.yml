@@ -14,3 +14,6 @@ order:
     type: in-memory
   event-publisher:
     type: in-memory
+
+server:
+  port: 8300

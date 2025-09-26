@@ -19,4 +19,6 @@ public interface OrderFacade {
 
     List<OrderItem> getReturnableItems(OrderId orderId);
 
+    List<Order> getOrdersByClientId(ClientId clientId);
+
 }
