@@ -33,7 +33,6 @@ class OrderItemEntity {
     private BigDecimal price;
 
 
-    // set on database migration
     @Column(name = "is_returnable", nullable = false)
     private Boolean isReturnable;
 

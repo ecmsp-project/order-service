@@ -15,6 +15,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+//TODO works if jdbc db strategy set as create, update application.yml and version for tests
 @DataJpaTest
 public class DbOrderRepositoryTest {
 

@@ -53,7 +53,10 @@ class DbOrderRepository implements OrderRepository {
 
     @Override
     public List<Order> findByClientId(ClientId clientId) {
-        return List.of();
+        return orderEntityRepository.findByClientId(clientId.value())
+            .stream()
+            .map(orderEntityMapper::toOrder)
+            .toList();
     }
 
 }
