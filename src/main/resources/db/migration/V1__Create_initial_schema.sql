@@ -10,12 +10,14 @@ CREATE TABLE orders
 
 CREATE TABLE order_item
 (
-    item_id     UUID PRIMARY KEY,
-    order_id    UUID    NOT NULL,
-    item_name   VARCHAR NOT NULL,
-    quantity    INTEGER NOT NULL,
-    price       DECIMAL NOT NULL,
-    description VARCHAR,
+    order_item_id UUID PRIMARY KEY,
+    item_id       UUID NOT NULL,
+    order_id      UUID    NOT NULL,
+    item_name     VARCHAR NOT NULL,
+    quantity      INTEGER NOT NULL,
+    price         DECIMAL NOT NULL,
+    description   VARCHAR,
+    is_returnable BOOLEAN NOT NULL,
     CONSTRAINT fk_order_item_order
         FOREIGN KEY (order_id)
             REFERENCES orders (order_id)

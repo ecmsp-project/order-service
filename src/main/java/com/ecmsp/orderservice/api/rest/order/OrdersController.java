@@ -4,6 +4,8 @@ import com.ecmsp.orderservice.api.rest.order.dto.CreateOrderRequest;
 import com.ecmsp.orderservice.api.rest.order.dto.OrderDetailsResponse;
 import com.ecmsp.orderservice.api.rest.order.dto.OrderReturnabilityResponse;
 import com.ecmsp.orderservice.api.rest.order.dto.UpdateOrderRequest;
+import com.ecmsp.orderservice.application.security.UserContext;
+import com.ecmsp.orderservice.application.security.UserContextData;
 import com.ecmsp.orderservice.order.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,11 +30,23 @@ public class OrdersController {
         this.orderMapper = new OrderControllerMapper();
     }
 
+
+    //TODO: authorization for this endpoint (only admin can see all orders) - use userContext and retrieve group / role from there
     @GetMapping
     public ResponseEntity<List<OrderDetailsResponse>> listOrders() {
         List<Order> orders = orderFacade.getAllOrders();
         return ResponseEntity.ok(orders.stream().map(orderMapper::toOrderDetailsResponse).toList());
     }
+
+
+    //! use for tests - gateway calls
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrderDetailsResponse>> listOrdersByUserId(@UserContext UserContextData userContextData) {
+        ClientId clientId = new ClientId(UUID.fromString(userContextData.userId()));
+        List<Order> orders = orderFacade.getOrdersByClientId(clientId);
+        return ResponseEntity.ok(orders.stream().map(orderMapper::toOrderDetailsResponse).toList());
+    }
+
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDetailsResponse> getOrderById(@PathVariable UUID orderId) {
@@ -96,26 +110,6 @@ public class OrdersController {
         return ResponseEntity.ok(canBeReturned);
     }
 
-    // TODO: Replace with query params in GET /api/orders
-//    @GetMapping("/client/{clientId}")
-//    public ResponseEntity<List<OrderEntity>> getOrdersByClientId(@PathVariable UUID clientId) {
-//        List<OrderEntity> orders = orderService.getOrdersByClientId(clientId);
-//        return ResponseEntity.ok(orders);
-//    }
 
-    // TODO: Replace with query params in GET /api/orders
-//    @GetMapping("/today")
-//    public ResponseEntity<List<OrderEntity>> getTodayOrders() {
-//        List<OrderEntity> orders = orderService.getTodayOrders();
-//        return ResponseEntity.ok(orders);
-//    }
-
-
-    // TODO: Replace with query params in GET /api/orders
-//    @GetMapping("/count/{status}")
-//    public ResponseEntity<Long> countOrdersByStatus(@PathVariable OrderStatus status) {
-//        long count = orderService.countOrdersByStatus(status);
-//        return ResponseEntity.ok(count);
-//    }
 
 }

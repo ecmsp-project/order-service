@@ -1,9 +1,6 @@
 package com.ecmsp.orderservice.order.adapter.repository.db;
 
-import com.ecmsp.orderservice.order.domain.Order;
-import com.ecmsp.orderservice.order.domain.OrderException;
-import com.ecmsp.orderservice.order.domain.OrderId;
-import com.ecmsp.orderservice.order.domain.OrderRepository;
+import com.ecmsp.orderservice.order.domain.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -52,6 +49,14 @@ class DbOrderRepository implements OrderRepository {
     @Override
     public void deleteById(OrderId orderId) {
         orderEntityRepository.deleteById(orderId.value());
+    }
+
+    @Override
+    public List<Order> findByClientId(ClientId clientId) {
+        return orderEntityRepository.findByClientId(clientId.value())
+            .stream()
+            .map(orderEntityMapper::toOrder)
+            .toList();
     }
 
 }

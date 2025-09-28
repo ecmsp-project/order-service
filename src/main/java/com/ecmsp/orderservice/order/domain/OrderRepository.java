@@ -15,4 +15,6 @@ public interface OrderRepository {
 
     void deleteById(OrderId orderId);
 
+    List<Order> findByClientId(ClientId clientId);
+
 }

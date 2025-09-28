@@ -99,4 +99,8 @@ public class DefaultOrderFacade implements OrderFacade {
         return orderReturnService.getReturnableItems(orderId);
     }
 
+    public List<Order> getOrdersByClientId(ClientId clientId) {
+        return orderRepository.findByClientId(clientId);
+    }
+
 }

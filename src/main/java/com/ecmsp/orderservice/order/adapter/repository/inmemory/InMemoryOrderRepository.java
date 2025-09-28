@@ -1,9 +1,6 @@
 package com.ecmsp.orderservice.order.adapter.repository.inmemory;
 
-import com.ecmsp.orderservice.order.domain.Order;
-import com.ecmsp.orderservice.order.domain.OrderException;
-import com.ecmsp.orderservice.order.domain.OrderId;
-import com.ecmsp.orderservice.order.domain.OrderRepository;
+import com.ecmsp.orderservice.order.domain.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +31,11 @@ class InMemoryOrderRepository implements OrderRepository {
     @Override
     public void deleteById(OrderId orderId) {
         orders.remove(orderId);
+    }
+
+    @Override
+    public List<Order> findByClientId(ClientId clientId) {
+        return List.of();
     }
 
     @Override

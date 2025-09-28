@@ -1,10 +1,5 @@
 package com.ecmsp.orderservice.order.domain;
 
-import com.ecmsp.orderservice.order.domain.Order;
-import com.ecmsp.orderservice.order.domain.OrderException;
-import com.ecmsp.orderservice.order.domain.OrderId;
-import com.ecmsp.orderservice.order.domain.OrderRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,5 +44,10 @@ class TestOrderRepository implements OrderRepository {
     @Override
     public void deleteById(OrderId orderId) {
         orders.remove(orderId);
+    }
+
+    @Override
+    public List<Order> findByClientId(ClientId clientId) {
+        return List.of();
     }
 }

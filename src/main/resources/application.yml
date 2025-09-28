@@ -2,7 +2,7 @@ spring:
   application:
     name: Order service
   jpa:
-    hibernate.ddl-auto: none # TODO: set to none once flyway integration is finished
+    hibernate.ddl-auto: create # TODO: should be validate but set like this for DbOrderRepositoryTest
     properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   datasource:
@@ -54,3 +54,4 @@ grpc:
     port: 9090
     security:
       enabled: false # Set to true to enable TLS
+
