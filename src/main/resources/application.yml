@@ -2,7 +2,7 @@ spring:
   application:
     name: Order service
   jpa:
-    hibernate.ddl-auto: create # TODO: should be validate but set like this for DbOrderRepositoryTest
+    hibernate.ddl-auto: validate # TODO: jdbc test doesn't work because example data are added in migration scripts
     properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   datasource:
@@ -55,3 +55,5 @@ grpc:
     security:
       enabled: false # Set to true to enable TLS
 
+server:
+  port: 8300

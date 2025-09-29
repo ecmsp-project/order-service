@@ -2,8 +2,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
   datasource:
-    #TODO update db ports to match docker env.
-    url: jdbc:postgresql://localhost:5432/order-service-db
+    url: jdbc:postgresql://localhost:9300/order-service-db
     username: admin
     password: admin
 
@@ -16,5 +15,3 @@ order:
   event-publisher:
     type: in-memory
 
-server:
-  port: 8300

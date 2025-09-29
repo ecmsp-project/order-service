@@ -363,7 +363,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>11.11.2</version>
                 <configuration>
-                    <url>jdbc:postgresql://localhost:5432/order-service-db</url>
+                    <url>jdbc:postgresql://localhost:9300/order-service-db</url>
                     <user>admin</user>
                     <password>admin</password>
                     <schemas>
