@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.application.security;
+package com.ecmsp.orderservice.application.security.rest;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

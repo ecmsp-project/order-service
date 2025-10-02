@@ -1,5 +1,6 @@
-package com.ecmsp.orderservice.application.security;
+package com.ecmsp.orderservice.application.security.rest;
 
+import com.ecmsp.orderservice.application.security.UserContextData;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
-public class UserContextArgumentResolver implements HandlerMethodArgumentResolver {
+class UserContextArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

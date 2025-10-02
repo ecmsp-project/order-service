@@ -67,7 +67,7 @@ public final class E2ETestEnvironment {
     }
 
     public static URI orderServiceGrpcUrl() {
-        return URI.create("http://localhost:9090");
+        return URI.create("http://localhost:7300");
     }
 
     public static URI orderServiceRestUrl() {

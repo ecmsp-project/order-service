@@ -158,7 +158,7 @@ The service includes gRPC endpoints using protobuf definitions from the `com.ecm
 ### gRPC API Endpoints
 
 #### Service Configuration
-- **gRPC Server**: `localhost:9090`
+- **gRPC Server**: `localhost:7300`
 - **Proto Package**: `com.ecmsp.order.v1`
 - **Service**: `OrderService`
 

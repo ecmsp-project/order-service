@@ -46,7 +46,7 @@ kafka:
 
 grpc:
   server:
-    port: 9090
+    port: 7300
     security:
       enabled: false # Set to true to enable TLS
 
