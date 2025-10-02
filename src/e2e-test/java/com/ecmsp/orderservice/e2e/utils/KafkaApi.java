@@ -7,12 +7,8 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
-import org.apache.kafka.streams.processor.internals.assignment.DefaultTaskTopicPartition;
 
-
-import java.net.URI;
 import java.util.List;
-
 import java.util.UUID;
 
 public class KafkaApi {
