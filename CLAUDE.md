@@ -63,4 +63,168 @@ The service includes gRPC endpoints using protobuf definitions from the `com.ecm
 - PostgreSQL for production
 - H2 for testing
 - JPA entities with Hibernate
-- Liquibase for migrations (if configured)
+- Flyway for migrations (enabled by default)
+
+## API Endpoints for E2E Testing
+
+### REST API Endpoints
+
+#### Base URL
+- **REST API**: `http://localhost:8300/api/orders`
+- **Health Check**: `http://localhost:8300/health`
+
+#### OrdersController (`/api/orders`)
+
+**GET /api/orders**
+- List all orders (TODO: requires admin authorization)
+- Response: `200 OK` with array of `OrderDetailsResponse`
+
+**GET /api/orders/user/{userId}**
+- List orders by user ID (uses JWT context from gateway)
+- Requires: `X-User-Id` header (injected by gateway)
+- Response: `200 OK` with array of `OrderDetailsResponse`
+
+**GET /api/orders/{orderId}**
+- Get order by ID
+- Path parameter: `orderId` (UUID)
+- Response: `200 OK` with `OrderDetailsResponse` or `404 Not Found`
+
+**POST /api/orders**
+- Create a new order
+- Headers:
+  - `X-Correlation-Id` (optional): UUID for request correlation
+- Request body: `CreateOrderRequest`
+```json
+{
+  "clientId": "uuid",
+  "items": [
+    {
+      "itemId": "uuid",
+      "quantity": 1,
+      "price": 99.99,
+      "returnable": true
+    }
+  ]
+}
+```
+- Response: `201 Created` with `OrderDetailsResponse`
+
+**PUT /api/orders/{orderId}**
+- Update order status
+- Path parameter: `orderId` (UUID)
+- Request body: `UpdateOrderRequest`
+```json
+{
+  "orderStatus": "PAID"
+}
+```
+- Valid statuses: `PENDING`, `PROCESSING`, `PAID`, `FAILED`, `CANCELLED`, `COMPLETED`
+- Response: `200 OK` with `OrderDetailsResponse`
+
+**DELETE /api/orders/{orderId}**
+- Delete an order
+- Path parameter: `orderId` (UUID)
+- Response: `204 No Content`
+
+**GET /api/orders/{orderId}/returnability**
+- Get order returnability details
+- Path parameter: `orderId` (UUID)
+- Response: `200 OK` with `OrderReturnabilityResponse` or `404 Not Found`
+
+**GET /api/orders/{orderId}/returnable**
+- Check if order can be returned (boolean)
+- Path parameter: `orderId` (UUID)
+- Response: `200 OK` with boolean value
+
+#### InternalOrdersController (`/api/internal/orders`)
+
+**POST /api/internal/orders/order-id-mappings**
+- Create order ID mapping (only available when `order.id-generator.type=fixed`)
+- Request body: `OrderIdMappingDto`
+```json
+{
+  "correlationId": "uuid",
+  "orderId": "uuid"
+}
+```
+- Response: `200 OK`
+
+#### HealthController (`/health`)
+
+**GET /health**
+- Health check endpoint
+- Response: `200 OK` with `"OK"` string
+
+### gRPC API Endpoints
+
+#### Service Configuration
+- **gRPC Server**: `localhost:7300`
+- **Proto Package**: `com.ecmsp.order.v1`
+- **Service**: `OrderService`
+
+#### gRPC Methods
+
+**GetOrder**
+- Request: `GetOrderRequest { string order_id }`
+- Response: `GetOrderResponse` with order details
+- Errors: `NOT_FOUND` if order doesn't exist, `INTERNAL` for other errors
+
+**CreateOrder**
+- Request: `CreateOrderRequest` with client ID and items
+- Response: `CreateOrderResponse` with created order details
+- Note: Context/metadata support is planned for future versions
+- Errors: `INTERNAL` on failure
+
+**UpdateOrder**
+- Request: `UpdateOrderRequest` with order ID and new status
+- Response: `UpdateOrderResponse` with updated order details
+- Errors: `NOT_FOUND` if order doesn't exist, `INTERNAL` for other errors
+
+**DeleteOrder**
+- Request: `DeleteOrderRequest { string order_id }`
+- Response: `DeleteOrderResponse { bool success }`
+- Errors: `INTERNAL` on failure
+
+**ListOrders**
+- Request: `ListOrdersRequest` (empty)
+- Response: `ListOrdersResponse` with array of orders
+- Errors: `INTERNAL` on failure
+
+### Response Models
+
+**OrderDetailsResponse**
+```json
+{
+  "orderId": "uuid",
+  "clientId": "uuid",
+  "orderStatus": "PENDING|PROCESSING|PAID|FAILED|CANCELLED|COMPLETED",
+  "date": "2025-09-30T12:00:00",
+  "items": [
+    {
+      "itemId": "uuid",
+      "quantity": 1
+    }
+  ]
+}
+```
+
+### E2E Testing Notes
+
+1. **Authentication**: The service expects JWT context via headers (injected by API Gateway)
+   - Use `/api/orders/user/{userId}` endpoint to test gateway integration
+
+2. **Correlation IDs**: Include `X-Correlation-Id` header for request tracing
+
+3. **Order Lifecycle**:
+   - Orders start in `PENDING` status
+   - Payment processing moves to `PROCESSING` then `PAID` or `FAILED`
+   - Can be `CANCELLED` by user or system
+   - Final status is `COMPLETED` after delivery
+
+4. **Kafka Integration**: Creating orders triggers payment requests via Kafka
+   - Topic: `payment-request`
+   - Listen on: `payment-processed-succeeded` or `payment-processed-failed` for results
+
+5. **Database State**: Orders are persisted to PostgreSQL (or H2 in tests)
+
+6. **Proto Definitions**: gRPC contracts are defined in `com.ecmsp:protos` dependency

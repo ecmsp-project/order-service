@@ -51,6 +51,7 @@ class DbOrderRepository implements OrderRepository {
         orderEntityRepository.deleteById(orderId.value());
     }
 
+    @Transactional
     @Override
     public List<Order> findByClientId(ClientId clientId) {
         return orderEntityRepository.findByClientId(clientId.value())

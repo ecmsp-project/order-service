@@ -2,6 +2,8 @@ package com.ecmsp.orderservice.api.grpc;
 
 import com.ecmsp.order.v1.*;
 import com.ecmsp.order.v1.OrderServiceGrpc;
+import com.ecmsp.orderservice.application.security.grpc.UserContextGrpcHolder;
+import com.ecmsp.orderservice.application.security.UserContextData;
 import com.ecmsp.orderservice.order.domain.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -96,4 +98,24 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
+
+
+    //TODO ADDED TO CHECK GRPC CALLS FROM GATEWAY
+    @Override
+    public void listOrdersByUserId(ListOrdersByUserIdRequest request, StreamObserver<ListOrdersByUserIdResponse> responseObserver) {
+            try {
+                UserContextData userContextData = UserContextGrpcHolder.getUserContext();
+
+                //TODO: already used metadata request payload is redundant
+                var orders = orderFacade.getOrdersByClientId(new ClientId(UUID.fromString(userContextData.userId())));
+                var response = ListOrdersByUserIdResponse.newBuilder()
+                        .addAllOrders(orders.stream().map(orderGrpcMapper::toOrderResponse).toList())
+                        .build();
+                responseObserver.onNext(response);
+                responseObserver.onCompleted();
+            } catch (Exception e) {
+                responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            }
+        }
+
 }

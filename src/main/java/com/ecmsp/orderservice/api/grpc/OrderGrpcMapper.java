@@ -110,6 +110,7 @@ public class OrderGrpcMapper {
         );
     }
 
+    //TODO: COMPATITLE WITH SCHEMA DEFINITIONS BUT NOT THIS SERVICE DOMAIN
     private OrderItemDetails toOrderItemDetails(OrderItem item) {
         return OrderItemDetails.newBuilder()
                 .setItemId(item.itemId().toString())

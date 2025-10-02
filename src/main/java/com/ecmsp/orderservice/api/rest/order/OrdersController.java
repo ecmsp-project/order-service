@@ -4,7 +4,7 @@ import com.ecmsp.orderservice.api.rest.order.dto.CreateOrderRequest;
 import com.ecmsp.orderservice.api.rest.order.dto.OrderDetailsResponse;
 import com.ecmsp.orderservice.api.rest.order.dto.OrderReturnabilityResponse;
 import com.ecmsp.orderservice.api.rest.order.dto.UpdateOrderRequest;
-import com.ecmsp.orderservice.application.security.UserContext;
+import com.ecmsp.orderservice.application.security.rest.UserContext;
 import com.ecmsp.orderservice.application.security.UserContextData;
 import com.ecmsp.orderservice.order.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
