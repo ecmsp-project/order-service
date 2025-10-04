@@ -16,12 +16,32 @@ import static com.ecmsp.orderservice.order.domain.OrderStatus.*;
 @Component
 public class OrderGrpcMapper {
 
-    public OrderResponse toOrderResponse(Order order) {
+    public GetOrderResponse toOrderResponse(Order order) {
         List<OrderItemDetails> itemDetails = order.items().stream()
                 .map(this::toOrderItemDetails)
                 .toList();
 
-        return OrderResponse.newBuilder()
+        return GetOrderResponse.newBuilder()
+                .setOrderId(order.orderId().toString())
+//                .setClientId(order.clientId().toString()) - optional shouldn't be added in response
+                .setOrderStatus(toOrderStatusProto(order.orderStatus()))
+                .setDate(order.date().toString())
+                .addAllItems(itemDetails)
+                .build();
+    }
+
+    public GetOrderResponse toGetOrderResponse(Order order) {
+        return toOrderResponse(order);
+    }
+
+
+
+    public CreateOrderResponse toCreateOrderResponse(Order order) {
+        List<OrderItemDetails> itemDetails = order.items().stream()
+                .map(this::toOrderItemDetails)
+                .toList();
+
+        return CreateOrderResponse.newBuilder()
                 .setOrderId(order.orderId().toString())
                 .setClientId(order.clientId().toString())
                 .setOrderStatus(toOrderStatusProto(order.orderStatus()))
@@ -30,42 +50,18 @@ public class OrderGrpcMapper {
                 .build();
     }
 
-    public GetOrderResponse toGetOrderResponse(Order order) {
-        OrderResponse baseResponse = toOrderResponse(order);
-
-        return GetOrderResponse.newBuilder()
-                .setOrderId(baseResponse.getOrderId())
-                .setClientId(baseResponse.getClientId())
-                .setOrderStatus(baseResponse.getOrderStatus())
-                .setDate(baseResponse.getDate())
-                .addAllItems(baseResponse.getItemsList())
-                .build();
-    }
-
-
-
-    public CreateOrderResponse toCreateOrderResponse(Order order) {
-        OrderResponse baseResponse = toOrderResponse(order);
-
-        return CreateOrderResponse.newBuilder()
-                .setOrderId(baseResponse.getOrderId())
-                .setClientId(baseResponse.getClientId())
-                .setOrderStatus(baseResponse.getOrderStatus())
-                .setDate(baseResponse.getDate())
-                .addAllItems(baseResponse.getItemsList())
-                .build();
-    }
-
 
     public UpdateOrderResponse toUpdateOrderResponse(Order order) {
-        OrderResponse baseResponse = toOrderResponse(order);
+        List<OrderItemDetails> itemDetails = order.items().stream()
+                .map(this::toOrderItemDetails)
+                .toList();
 
         return UpdateOrderResponse.newBuilder()
-                .setOrderId(baseResponse.getOrderId())
-                .setClientId(baseResponse.getClientId())
-                .setOrderStatus(baseResponse.getOrderStatus())
-                .setDate(baseResponse.getDate())
-                .addAllItems(baseResponse.getItemsList())
+                .setOrderId(order.orderId().toString())
+                .setClientId(order.clientId().toString())
+                .setOrderStatus(toOrderStatusProto(order.orderStatus()))
+                .setDate(order.date().toString())
+                .addAllItems(itemDetails)
                 .build();
     }
 
@@ -103,11 +99,21 @@ public class OrderGrpcMapper {
         );
     }
 
-    public OrderToUpdate toOrderToUpdate(UpdateOrderRequest request) {
-        return new OrderToUpdate(
-                new OrderId(UUID.fromString(request.getOrderId())),
-                toOrderStatusDomain(request.getOrderStatus())
-        );
+    public GetOrderStatusResponse toGetOrderStatusResponse(Order order) {
+        return GetOrderStatusResponse.newBuilder()
+                .setOrderId(order.orderId().toString())
+                .setOrderStatus(toOrderStatusProto(order.orderStatus()))
+                .build();
+    }
+
+    public GetOrderItemsResponse toGetOrderItemsResponse(Order order) {
+        List<OrderItemDetails> itemDetails = order.items().stream()
+                .map(this::toOrderItemDetails)
+                .toList();
+
+        return GetOrderItemsResponse.newBuilder()
+                .addAllItems(itemDetails)
+                .build();
     }
 
     //TODO: COMPATITLE WITH SCHEMA DEFINITIONS BUT NOT THIS SERVICE DOMAIN

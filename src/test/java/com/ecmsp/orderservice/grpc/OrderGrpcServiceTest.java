@@ -4,6 +4,7 @@ import com.ecmsp.order.v1.*;
 import com.ecmsp.orderservice.api.grpc.OrderGrpcMapper;
 import com.ecmsp.orderservice.api.grpc.OrderGrpcService;
 import com.ecmsp.orderservice.order.domain.*;
+import com.ecmsp.orderservice.order.domain.OrderStatus;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -197,29 +198,32 @@ class OrderGrpcServiceTest {
         private final StreamObserver<UpdateOrderResponse> responseObserver = mock(StreamObserver.class);
 
         @Test
-        @DisplayName("Should update order successfully")
-        void should_update_order_successfully() {
+        @DisplayName("Should auto-advance order from PENDING to PROCESSING")
+        void should_auto_advance_order_from_pending_to_processing() {
             // given
             UpdateOrderRequest request = UpdateOrderRequest.newBuilder()
                     .setOrderId(ORDER_UUID.toString())
                     .build();
-            OrderToUpdate orderToUpdate = mock(OrderToUpdate.class);
-            Order updatedOrder = mock(Order.class);
+            Order pendingOrder = new Order(ORDER_ID, CLIENT_ID, OrderStatus.PENDING, null, null);
+            Order processingOrder = new Order(ORDER_ID, CLIENT_ID, OrderStatus.PROCESSING, null, null);
             UpdateOrderResponse expectedResponse = UpdateOrderResponse.newBuilder()
                     .setOrderId(ORDER_UUID.toString())
                     .build();
 
-            when(orderGrpcMapper.toOrderToUpdate(request)).thenReturn(orderToUpdate);
-            when(orderFacade.updateOrder(orderToUpdate)).thenReturn(updatedOrder);
-            when(orderGrpcMapper.toUpdateOrderResponse(updatedOrder)).thenReturn(expectedResponse);
+            when(orderFacade.findOrderById(ORDER_ID)).thenReturn(Optional.of(pendingOrder));
+            when(orderFacade.updateOrder(argThat(orderToUpdate ->
+                    orderToUpdate.orderId().equals(ORDER_ID) &&
+                            orderToUpdate.newStatus() == OrderStatus.PROCESSING
+            ))).thenReturn(processingOrder);
+            when(orderGrpcMapper.toUpdateOrderResponse(processingOrder)).thenReturn(expectedResponse);
 
             // when
             orderGrpcService.updateOrder(request, responseObserver);
 
             // then
-            verify(orderGrpcMapper).toOrderToUpdate(request);
-            verify(orderFacade).updateOrder(orderToUpdate);
-            verify(orderGrpcMapper).toUpdateOrderResponse(updatedOrder);
+            verify(orderFacade).findOrderById(ORDER_ID);
+            verify(orderFacade).updateOrder(any(OrderToUpdate.class));
+            verify(orderGrpcMapper).toUpdateOrderResponse(processingOrder);
             verify(responseObserver).onNext(expectedResponse);
             verify(responseObserver).onCompleted();
             verify(responseObserver, never()).onError(any());
@@ -232,10 +236,8 @@ class OrderGrpcServiceTest {
             UpdateOrderRequest request = UpdateOrderRequest.newBuilder()
                     .setOrderId(ORDER_UUID.toString())
                     .build();
-            OrderToUpdate orderToUpdate = mock(OrderToUpdate.class);
 
-            when(orderGrpcMapper.toOrderToUpdate(request)).thenReturn(orderToUpdate);
-            when(orderFacade.updateOrder(orderToUpdate)).thenThrow(new OrderException.NotFound(ORDER_ID));
+            when(orderFacade.findOrderById(ORDER_ID)).thenReturn(Optional.empty());
 
             // when
             orderGrpcService.updateOrder(request, responseObserver);
@@ -258,10 +260,8 @@ class OrderGrpcServiceTest {
             UpdateOrderRequest request = UpdateOrderRequest.newBuilder()
                     .setOrderId(ORDER_UUID.toString())
                     .build();
-            OrderToUpdate orderToUpdate = mock(OrderToUpdate.class);
 
-            when(orderGrpcMapper.toOrderToUpdate(request)).thenReturn(orderToUpdate);
-            when(orderFacade.updateOrder(orderToUpdate)).thenThrow(new RuntimeException("Unexpected error"));
+            when(orderFacade.findOrderById(ORDER_ID)).thenThrow(new RuntimeException("Unexpected error"));
 
             // when
             orderGrpcService.updateOrder(request, responseObserver);
@@ -324,6 +324,176 @@ class OrderGrpcServiceTest {
     }
 
     @Nested
+    @DisplayName("Get Order Status Tests")
+    class GetOrderStatusTests {
+
+        private final StreamObserver<GetOrderStatusResponse> responseObserver = mock(StreamObserver.class);
+
+        @Test
+        @DisplayName("Should return order status when order exists")
+        void should_return_order_status_when_exists() {
+            // given
+            GetOrderStatusResponse expectedResponse = GetOrderStatusResponse.newBuilder()
+                    .setOrderId(ORDER_UUID.toString())
+                    .setOrderStatus(com.ecmsp.order.v1.OrderStatus.ORDER_STATUS_PENDING)
+                    .build();
+            GetOrderStatusRequest request = GetOrderStatusRequest.newBuilder()
+                    .setOrderId(ORDER_UUID.toString())
+                    .build();
+
+            when(orderFacade.findOrderById(ORDER_ID)).thenReturn(Optional.of(testOrder));
+            when(orderGrpcMapper.toGetOrderStatusResponse(testOrder)).thenReturn(expectedResponse);
+
+            // when
+            orderGrpcService.getOrderStatus(request, responseObserver);
+
+            // then
+            verify(orderFacade).findOrderById(ORDER_ID);
+            verify(orderGrpcMapper).toGetOrderStatusResponse(testOrder);
+            verify(responseObserver).onNext(expectedResponse);
+            verify(responseObserver).onCompleted();
+            verify(responseObserver, never()).onError(any());
+        }
+
+        @Test
+        @DisplayName("Should return NOT_FOUND when order does not exist")
+        void should_return_not_found_when_order_does_not_exist() {
+            // given
+            GetOrderStatusRequest request = GetOrderStatusRequest.newBuilder()
+                    .setOrderId(ORDER_UUID.toString())
+                    .build();
+
+            when(orderFacade.findOrderById(ORDER_ID)).thenReturn(Optional.empty());
+
+            // when
+            orderGrpcService.getOrderStatus(request, responseObserver);
+
+            // then
+            verify(orderFacade).findOrderById(ORDER_ID);
+            verify(orderGrpcMapper, never()).toGetOrderStatusResponse(any());
+            verify(responseObserver, never()).onNext(any());
+            verify(responseObserver, never()).onCompleted();
+
+            ArgumentCaptor<StatusRuntimeException> exceptionCaptor = ArgumentCaptor.forClass(StatusRuntimeException.class);
+            verify(responseObserver).onError(exceptionCaptor.capture());
+
+            StatusRuntimeException exception = exceptionCaptor.getValue();
+            assertThat(exception.getStatus().getCode()).isEqualTo(Status.NOT_FOUND.getCode());
+            assertThat(exception.getMessage()).contains("Order not found");
+        }
+
+        @Test
+        @DisplayName("Should return INTERNAL error when exception occurs")
+        void should_return_internal_error_when_exception_occurs() {
+            // given
+            GetOrderStatusRequest request = GetOrderStatusRequest.newBuilder()
+                    .setOrderId(ORDER_UUID.toString())
+                    .build();
+            String errorMessage = "Database connection failed";
+
+            when(orderFacade.findOrderById(ORDER_ID)).thenThrow(new RuntimeException(errorMessage));
+
+            // when
+            orderGrpcService.getOrderStatus(request, responseObserver);
+
+            // then
+            verify(responseObserver, never()).onNext(any());
+            verify(responseObserver, never()).onCompleted();
+
+            ArgumentCaptor<StatusRuntimeException> exceptionCaptor = ArgumentCaptor.forClass(StatusRuntimeException.class);
+            verify(responseObserver).onError(exceptionCaptor.capture());
+
+            StatusRuntimeException exception = exceptionCaptor.getValue();
+            assertThat(exception.getStatus().getCode()).isEqualTo(Status.INTERNAL.getCode());
+            assertThat(exception.getMessage()).contains(errorMessage);
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Order Items Tests")
+    class GetOrderItemsTests {
+
+        private final StreamObserver<GetOrderItemsResponse> responseObserver = mock(StreamObserver.class);
+
+        @Test
+        @DisplayName("Should return order items when order exists")
+        void should_return_order_items_when_exists() {
+            // given
+            GetOrderItemsResponse expectedResponse = GetOrderItemsResponse.newBuilder()
+                    .build();
+            GetOrderItemsRequest request = GetOrderItemsRequest.newBuilder()
+                    .setOrderId(ORDER_UUID.toString())
+                    .build();
+
+            when(orderFacade.findOrderById(ORDER_ID)).thenReturn(Optional.of(testOrder));
+            when(orderGrpcMapper.toGetOrderItemsResponse(testOrder)).thenReturn(expectedResponse);
+
+            // when
+            orderGrpcService.getOrderItems(request, responseObserver);
+
+            // then
+            verify(orderFacade).findOrderById(ORDER_ID);
+            verify(orderGrpcMapper).toGetOrderItemsResponse(testOrder);
+            verify(responseObserver).onNext(expectedResponse);
+            verify(responseObserver).onCompleted();
+            verify(responseObserver, never()).onError(any());
+        }
+
+        @Test
+        @DisplayName("Should return NOT_FOUND when order does not exist")
+        void should_return_not_found_when_order_does_not_exist() {
+            // given
+            GetOrderItemsRequest request = GetOrderItemsRequest.newBuilder()
+                    .setOrderId(ORDER_UUID.toString())
+                    .build();
+
+            when(orderFacade.findOrderById(ORDER_ID)).thenReturn(Optional.empty());
+
+            // when
+            orderGrpcService.getOrderItems(request, responseObserver);
+
+            // then
+            verify(orderFacade).findOrderById(ORDER_ID);
+            verify(orderGrpcMapper, never()).toGetOrderItemsResponse(any());
+            verify(responseObserver, never()).onNext(any());
+            verify(responseObserver, never()).onCompleted();
+
+            ArgumentCaptor<StatusRuntimeException> exceptionCaptor = ArgumentCaptor.forClass(StatusRuntimeException.class);
+            verify(responseObserver).onError(exceptionCaptor.capture());
+
+            StatusRuntimeException exception = exceptionCaptor.getValue();
+            assertThat(exception.getStatus().getCode()).isEqualTo(Status.NOT_FOUND.getCode());
+            assertThat(exception.getMessage()).contains("Order not found");
+        }
+
+        @Test
+        @DisplayName("Should return INTERNAL error when exception occurs")
+        void should_return_internal_error_when_exception_occurs() {
+            // given
+            GetOrderItemsRequest request = GetOrderItemsRequest.newBuilder()
+                    .setOrderId(ORDER_UUID.toString())
+                    .build();
+            String errorMessage = "Database connection failed";
+
+            when(orderFacade.findOrderById(ORDER_ID)).thenThrow(new RuntimeException(errorMessage));
+
+            // when
+            orderGrpcService.getOrderItems(request, responseObserver);
+
+            // then
+            verify(responseObserver, never()).onNext(any());
+            verify(responseObserver, never()).onCompleted();
+
+            ArgumentCaptor<StatusRuntimeException> exceptionCaptor = ArgumentCaptor.forClass(StatusRuntimeException.class);
+            verify(responseObserver).onError(exceptionCaptor.capture());
+
+            StatusRuntimeException exception = exceptionCaptor.getValue();
+            assertThat(exception.getStatus().getCode()).isEqualTo(Status.INTERNAL.getCode());
+            assertThat(exception.getMessage()).contains(errorMessage);
+        }
+    }
+
+    @Nested
     @DisplayName("List Orders Tests")
     class ListOrdersTests {
 
@@ -335,7 +505,7 @@ class OrderGrpcServiceTest {
         void should_list_all_orders_successfully() {
             // given
             List<Order> orders = List.of(testOrder);
-            OrderResponse orderResponse = OrderResponse.newBuilder()
+            GetOrderResponse orderResponse = GetOrderResponse.newBuilder()
                     .setOrderId(ORDER_UUID.toString())
                     .build();
             ListOrdersRequest request = ListOrdersRequest.newBuilder().build();
