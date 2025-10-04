@@ -23,7 +23,7 @@ public class OrderGrpcMapper {
 
         return GetOrderResponse.newBuilder()
                 .setOrderId(order.orderId().toString())
-                .setClientId(order.clientId().toString())
+//                .setClientId(order.clientId().toString()) - optional shouldn't be added in response
                 .setOrderStatus(toOrderStatusProto(order.orderStatus()))
                 .setDate(order.date().toString())
                 .addAllItems(itemDetails)
