@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
+//TODO: DEPRECATED - WONT BE USED - USE GRPC INSTEAD
 @RestController
 @RequestMapping("/api/orders")
 public class OrdersController {

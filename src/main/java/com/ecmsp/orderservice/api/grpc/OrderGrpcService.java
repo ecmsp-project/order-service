@@ -100,7 +100,6 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
     }
 
 
-    //TODO ADDED TO CHECK GRPC CALLS FROM GATEWAY
     @Override
     public void listOrdersByUserId(ListOrdersByUserIdRequest request, StreamObserver<ListOrdersByUserIdResponse> responseObserver) {
             try {
@@ -116,6 +115,6 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
             } catch (Exception e) {
                 responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
             }
-        }
+    }
 
 }
