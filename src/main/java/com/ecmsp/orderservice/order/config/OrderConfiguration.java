@@ -10,8 +10,8 @@ import java.time.Clock;
 class OrderConfiguration {
 
     @Bean
-    OrderReturnService orderReturnService(OrderRepository orderRepository) {
-        return new OrderReturnService(orderRepository);
+    OrderReturnabilityService orderReturnService(OrderRepository orderRepository) {
+        return new OrderReturnabilityService(orderRepository);
     }
 
     @Bean
@@ -20,7 +20,7 @@ class OrderConfiguration {
         OrderIdGenerator orderIdGenerator,
         PaymentClient paymentEventPublisher,
         OrderEventPublisher orderEventPublisher,
-        OrderReturnService orderReturnService,
+        OrderReturnabilityService orderReturnabilityService,
         Clock clock
     ) {
         return new DefaultOrderFacade(
@@ -28,7 +28,7 @@ class OrderConfiguration {
             /* orderIdGenerator = */ orderIdGenerator,
             /* paymentEventPublisher = */ paymentEventPublisher,
             /* orderEventPublisher = */ orderEventPublisher,
-            /* orderReturnService = */ orderReturnService,
+            /* orderReturnService = */ orderReturnabilityService,
             /* clock = */ clock
         );
     }

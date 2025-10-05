@@ -11,7 +11,7 @@ public class DefaultOrderFacade implements OrderFacade {
     private final OrderIdGenerator orderIdGenerator;
     private final PaymentClient paymentClient;
     private final OrderEventPublisher orderEventPublisher;
-    private final OrderReturnService orderReturnService;
+    private final OrderReturnabilityService orderReturnabilityService;
     private final Clock clock;
 
     public DefaultOrderFacade(
@@ -19,14 +19,14 @@ public class DefaultOrderFacade implements OrderFacade {
             OrderIdGenerator orderIdGenerator,
             PaymentClient paymentEventPublisher,
             OrderEventPublisher orderEventPublisher,
-            OrderReturnService orderReturnService,
+            OrderReturnabilityService orderReturnabilityService,
             Clock clock
     ) {
         this.orderRepository = orderRepository;
         this.orderIdGenerator = orderIdGenerator;
         this.paymentClient = paymentEventPublisher;
         this.orderEventPublisher = orderEventPublisher;
-        this.orderReturnService = orderReturnService;
+        this.orderReturnabilityService = orderReturnabilityService;
         this.clock = clock;
     }
 
@@ -92,11 +92,11 @@ public class DefaultOrderFacade implements OrderFacade {
     }
 
     public boolean canOrderBeReturned(OrderId orderId) {
-        return orderReturnService.canOrderBeReturned(orderId);
+        return orderReturnabilityService.canOrderBeReturned(orderId);
     }
 
     public List<OrderItem> getReturnableItems(OrderId orderId) {
-        return orderReturnService.getReturnableItems(orderId);
+        return orderReturnabilityService.getReturnableItems(orderId);
     }
 
     public List<Order> getOrdersByClientId(ClientId clientId) {

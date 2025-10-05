@@ -2,11 +2,11 @@ package com.ecmsp.orderservice.order.domain;
 
 import java.util.List;
 
-public class OrderReturnService {
+public class OrderReturnabilityService {
 
     private final OrderRepository orderRepository;
 
-    public OrderReturnService(OrderRepository orderRepository) {
+    public OrderReturnabilityService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
 

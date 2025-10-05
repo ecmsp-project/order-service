@@ -1,7 +1,5 @@
 package com.ecmsp.orderservice.order.domain;
 
-import java.util.Map;
-
 public abstract class OrderException extends RuntimeException {
 
     protected OrderException(String message) {
@@ -29,4 +27,9 @@ public abstract class OrderException extends RuntimeException {
         }
     }
 
+    public static class OrderNotReturnable extends Throwable {
+        public OrderNotReturnable(OrderId orderId) {
+            super("Order with id `%s` is not returnable.".formatted(orderId.value()));
+        }
+    }
 }

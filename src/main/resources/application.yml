@@ -36,6 +36,7 @@ order:
   id-generator:
     type: random
 
+
 kafka:
   topic:
     payment-processed-succeeded: payment-processed-succeeded
