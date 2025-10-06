@@ -1,6 +1,9 @@
 package com.ecmsp.orderservice.order.adapter.repository.db;
 
+import com.ecmsp.orderservice.order.adapter.repository.db.returns.DbReturnRepository;
+import com.ecmsp.orderservice.order.adapter.repository.db.returns.ReturnEntityRepository;
 import com.ecmsp.orderservice.order.domain.OrderRepository;
+import com.ecmsp.orderservice.order.domain.returns.ReturnRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -22,6 +25,13 @@ class DbOrderRepositoryConfiguration {
     OrderRepository dbOrderRepository(OrderEntityRepository orderEntityRepository) {
         return new DbOrderRepository(
             /* orderEntityRepository = */ orderEntityRepository
+        );
+    }
+
+    @Bean
+    ReturnRepository dbReturnRepository(ReturnEntityRepository returnEntityRepository) {
+        return new DbReturnRepository(
+                /* returnEntityRepository = */ returnEntityRepository
         );
     }
 

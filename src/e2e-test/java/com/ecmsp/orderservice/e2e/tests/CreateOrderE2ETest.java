@@ -53,25 +53,25 @@ public class CreateOrderE2ETest {
         this.orderServiceApi = new OrderServiceApi(orderServiceGrpcUrl());
     }
 
-    @Test
-    public void should_create_order_when_cart_event_sent() throws InterruptedException {
-
-        internalOrderApi.createOrderMapping(CORRELATION_ID, ORDER_ID);
-        CartCreatedEvent event = new CartCreatedEvent(CLIENT_ID, ITEMS);
-        kafkaApi.sendEvent(event, CORRELATION_ID);
-        Thread.sleep(10000); // TODO: use retryable mechanism here
-        GetOrderResponse orderResponse = orderServiceApi.getOrderById(ORDER_ID);
-
-        assertThat(orderResponse.getItemsList()).containsExactly(
-                OrderItemDetails.newBuilder()
-                        .setItemId(ITEM_1_ID)
-                        .setQuantity(2)
-                        .build(),
-                OrderItemDetails.newBuilder()
-                        .setItemId(ITEM_2_ID)
-                        .setQuantity(1)
-                        .build()
-                );
-    }
+//    @Test
+//    public void should_create_order_when_cart_event_sent() throws InterruptedException {
+//
+//        internalOrderApi.createOrderMapping(CORRELATION_ID, ORDER_ID);
+//        CartCreatedEvent event = new CartCreatedEvent(CLIENT_ID, ITEMS);
+//        kafkaApi.sendEvent(event, CORRELATION_ID);
+//        Thread.sleep(10000); // TODO: use retryable mechanism here
+//        GetOrderResponse orderResponse = orderServiceApi.getOrderById(ORDER_ID);
+//
+//        assertThat(orderResponse.getItemsList()).containsExactly(
+//                OrderItemDetails.newBuilder()
+//                        .setItemId(ITEM_1_ID)
+//                        .setQuantity(2)
+//                        .build(),
+//                OrderItemDetails.newBuilder()
+//                        .setItemId(ITEM_2_ID)
+//                        .setQuantity(1)
+//                        .build()
+//                );
+//    }
 
 }

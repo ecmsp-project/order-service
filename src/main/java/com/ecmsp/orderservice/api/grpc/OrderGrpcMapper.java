@@ -23,7 +23,6 @@ public class OrderGrpcMapper {
 
         return GetOrderResponse.newBuilder()
                 .setOrderId(order.orderId().toString())
-//                .setClientId(order.clientId().toString()) - optional shouldn't be added in response
                 .setOrderStatus(toOrderStatusProto(order.orderStatus()))
                 .setDate(order.date().toString())
                 .addAllItems(itemDetails)
@@ -129,6 +128,7 @@ public class OrderGrpcMapper {
                 new ItemId(UUID.fromString(item.getItemId())),
                 item.getQuantity(),
                 BigDecimal.valueOf(item.getPrice()),
+                //TODO: variant_id should be added
                 true // Default to returnable for items created via gRPC
         );
     }
