@@ -1,4 +1,5 @@
 package com.ecmsp.orderservice.order.domain.returns;
+
 import com.ecmsp.orderservice.order.domain.*;
 
 import java.time.Clock;
@@ -27,24 +28,31 @@ public class DefaultReturnFacade implements ReturnFacade {
         Order order = orderRepository.findById(returnToCreate.orderId())
                 .orElseThrow(() -> new OrderException.NotFound(returnToCreate.orderId()));
 
-        if(!orderReturnabilityService.canOrderBeReturned(order.orderId())){
+        if (!orderReturnabilityService.canOrderBeReturned(order.orderId())) {
             throw new OrderException.OrderNotReturnable(order.orderId());
         }
 
         //TODO: context should be add here as in order facade
         ReturnId returnId = returnIdGenerator.generate(null);
 
-
-        //? Should I check if items to return are actually returnable? as I've got it from frontend their should be already otherwise client shouldn't be able to select them
+        List<ItemToReturnDetails> itemsThatCanBeReturned = retrieveItemsThatCanBeReturned(returnToCreate, order);
         ReturnOrder newReturn = new ReturnOrder(
                 returnId,
                 returnToCreate.orderId(),
-                returnToCreate.itemsToReturn(),
+                itemsThatCanBeReturned,
                 ReturnStatus.REQUESTED,
                 LocalDateTime.now(clock)
         );
 
         return returnRepository.save(newReturn);
+    }
+
+    private List<ItemToReturnDetails> retrieveItemsThatCanBeReturned(ReturnToCreate returnToCreate, Order order) {
+        List<OrderItem> returnableItems = orderReturnabilityService.getReturnableItems(order.orderId());
+        return returnToCreate.itemsToReturn().stream()
+                .filter(item -> returnableItems.stream()
+                        .anyMatch(returnableItem -> returnableItem.itemId().equals(item.itemId()))
+                ).toList();
     }
 
     @Override
