@@ -47,13 +47,6 @@ public class DefaultReturnFacade implements ReturnFacade {
         return returnRepository.save(newReturn);
     }
 
-    private List<ItemToReturnDetails> retrieveItemsThatCanBeReturned(ReturnToCreate returnToCreate, Order order) {
-        List<OrderItem> returnableItems = orderReturnabilityService.getReturnableItems(order.orderId());
-        return returnToCreate.itemsToReturn().stream()
-                .filter(item -> returnableItems.stream()
-                        .anyMatch(returnableItem -> returnableItem.itemId().equals(item.itemId()))
-                ).toList();
-    }
 
     @Override
     public Optional<ReturnOrder> findReturnById(ReturnId returnId) {
@@ -72,5 +65,15 @@ public class DefaultReturnFacade implements ReturnFacade {
         return userOrders.stream()
                 .flatMap(order -> returnRepository.findByOrderId(order.orderId()).stream())
                 .toList();
+    }
+
+
+
+    private List<ItemToReturnDetails> retrieveItemsThatCanBeReturned(ReturnToCreate returnToCreate, Order order) {
+        List<OrderItem> returnableItems = orderReturnabilityService.getReturnableItems(order.orderId());
+        return returnToCreate.itemsToReturn().stream()
+                .filter(item -> returnableItems.stream()
+                        .anyMatch(returnableItem -> returnableItem.itemId().equals(item.itemId()))
+                ).toList();
     }
 }

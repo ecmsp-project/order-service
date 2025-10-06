@@ -43,13 +43,29 @@ public class ReturnGrpcMapper {
     }
 
     public Return toReturn(ReturnOrder returnOrder) {
+
+        List<ItemReturnDetails> items = returnOrder.itemsToReturn().stream()
+                .map(this::toItemReturnDetails)
+                .toList();
+
         return Return.newBuilder()
                 .setReturnId(returnOrder.returnId().toString())
                 .setOrderId(returnOrder.orderId().toString())
+                .addAllItems(items)
                 .setStatus(toReturnStatusProto(returnOrder.status()))
                 .setCreatedAt(returnOrder.createdAt().toString())
                 .build();
     }
+
+    private ItemReturnDetails toItemReturnDetails(ItemToReturnDetails dto) {
+        return ItemReturnDetails.newBuilder()
+                .setItemId(dto.itemId().value().toString())
+                .setVariantId(dto.variantId().value().toString())
+                .setQuantity(dto.quantity())
+                .setReason(dto.reason())
+                .build();
+    }
+
 
     private com.ecmsp.order.v1.returns.v1.ReturnStatus toReturnStatusProto(com.ecmsp.orderservice.order.domain.returns.ReturnStatus status) {
         return switch (status) {
