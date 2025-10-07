@@ -4,8 +4,10 @@ import com.ecmsp.order.v1.*;
 import com.ecmsp.order.v1.OrderServiceGrpc;
 import com.ecmsp.orderservice.application.security.grpc.UserContextGrpcHolder;
 import com.ecmsp.orderservice.application.security.UserContextData;
-import com.ecmsp.orderservice.order.domain.*;
-import com.ecmsp.orderservice.order.domain.OrderStatus;
+import com.ecmsp.orderservice.order.domain.ClientId;
+import com.ecmsp.orderservice.order.domain.OrderFacade;
+import com.ecmsp.orderservice.order.domain.OrderId;
+import com.ecmsp.orderservice.order.domain.Order;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -106,84 +108,5 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
-
-    //? NOT SURE IF THIS IS NEEDED
-    @Override
-    public void updateOrder(UpdateOrderRequest request, StreamObserver<UpdateOrderResponse> responseObserver) {
-        try {
-            UUID orderId = UUID.fromString(request.getOrderId());
-            Optional<Order> order = orderFacade.findOrderById(new OrderId(orderId));
-
-            if (order.isEmpty()) {
-                responseObserver.onError(Status.NOT_FOUND.withDescription("Order not found").asRuntimeException());
-                return;
-            }
-
-            // Auto-advance order status based on current status
-            OrderStatus currentStatus = order.get().orderStatus();
-            OrderStatus nextStatus = switch (currentStatus) {
-                case PENDING -> OrderStatus.PROCESSING;
-                case PROCESSING -> OrderStatus.PAID;
-//                case PAID -> OrderStatus.COMPLETED; COMPLETED status does not exist in our domain
-                default -> currentStatus;
-            };
-
-            OrderToUpdate orderToUpdate = new OrderToUpdate(new OrderId(orderId), nextStatus);
-            Order updatedOrder = orderFacade.updateOrder(orderToUpdate);
-            UpdateOrderResponse response = orderGrpcMapper.toUpdateOrderResponse(updatedOrder);
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-        } catch (OrderException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).asRuntimeException());
-        } catch (Exception e){
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
-        }
-
-    }
-
-
-
-    /**
-     * @deprecated This method is deprecated and will be removed in a future version.
-     * Order creation should be done through the REST API or other designated endpoints.
-     */
-    @Deprecated
-    @Override
-    public void createOrder(CreateOrderRequest request, StreamObserver<CreateOrderResponse> responseObserver) {
-        try {
-            OrderToCreate orderToCreate = orderGrpcMapper.toOrderToCreate(request);
-            Order createdOrder = orderFacade.createOrder(orderToCreate, null);
-            CreateOrderResponse response = orderGrpcMapper.toCreateOrderResponse(createdOrder);
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
-        }
-    }
-
-
-
-
-    /**
-     * @deprecated This method is deprecated and will be removed in a future version.
-     * Order deletion should be done through the REST API or other designated endpoints.
-     */
-    @Deprecated
-    @Override
-    public void deleteOrder(DeleteOrderRequest request, StreamObserver<DeleteOrderResponse> responseObserver) {
-        try {
-            UUID orderId = UUID.fromString(request.getOrderId());
-            orderFacade.deleteOrder(new OrderId(orderId));
-            DeleteOrderResponse response = DeleteOrderResponse.newBuilder()
-                    .setSuccess(true)
-                    .build();
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
-        }
-    }
-
-
 
 }

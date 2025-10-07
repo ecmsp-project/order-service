@@ -43,6 +43,7 @@ public class DefaultOrderFacade implements OrderFacade {
 
         Order order = new Order(
                 /* orderId */ orderIdGenerator.generate(context.correlationId()),
+                        orderToCreate.reservationId(),
                 /* clientId */ orderToCreate.clientId(),
                 /* orderStatus */ OrderStatus.PENDING, // Assuming default status is PENDING
                 /* date */ LocalDateTime.now(clock),
@@ -69,6 +70,7 @@ public class DefaultOrderFacade implements OrderFacade {
 
         Order updatedOrder = new Order(
                 currentOrder.orderId(),
+                currentOrder.reservationId(),
                 currentOrder.clientId(),
                 orderToUpdate.newStatus(),
                 currentOrder.date(),

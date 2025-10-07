@@ -5,6 +5,7 @@ import com.ecmsp.orderservice.order.domain.*;
 import com.ecmsp.orderservice.order.domain.returns.ItemToReturnDetails;
 import com.ecmsp.orderservice.order.domain.returns.ReturnOrder;
 import com.ecmsp.orderservice.order.domain.returns.ReturnToCreate;
+import com.ecmsp.orderservice.order.domain.returns.ReturnStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -67,7 +68,7 @@ public class ReturnGrpcMapper {
     }
 
 
-    private com.ecmsp.order.v1.returns.v1.ReturnStatus toReturnStatusProto(com.ecmsp.orderservice.order.domain.returns.ReturnStatus status) {
+    private com.ecmsp.order.v1.returns.v1.ReturnStatus toReturnStatusProto(ReturnStatus status) {
         return switch (status) {
             case REQUESTED -> com.ecmsp.order.v1.returns.v1.ReturnStatus.RETURN_STATUS_REQUESTED;
             case PROCESSING -> com.ecmsp.order.v1.returns.v1.ReturnStatus.RETURN_STATUS_PROCESSING;

@@ -17,20 +17,28 @@ public class OrderFacadeTest {
 
     private static final OrderId ORDER_1_ID = new OrderId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
     private static final OrderId ORDER_2_ID = new OrderId(UUID.fromString("9e349a18-1203-4224-829c-dc15700c68a5"));
+    private static final ReservationId RESERVATION_1_ID = new ReservationId(UUID.fromString("c5e75ab0-a110-4a2a-b6f4-c4573e6f548e"));
+
 
     private static final ClientId CLIENT_1_ID = new ClientId(UUID.fromString("b5d1eec8-c3ea-4b55-8cec-900b5c018381"));
     private static final ClientId CLIENT_2_ID = new ClientId(UUID.fromString("b259c7f1-483b-4700-accc-1554542eb8f5"));
     private static final List<OrderItem> ITEMS = List.of(
             new OrderItem(
                     /* itemId = */ new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                    /* variantId = */ null,
                     /* quantity = */ 2,
                     /* price = */ BigDecimal.valueOf(10),
+                    /* imageUrl = */ null,
+                    /* description = */ null,
                     /* isReturnable = */ true
             ),
             new OrderItem(
                     /* itemId = */ new ItemId(UUID.fromString("473c1579-12b1-49b0-b90e-253782c874a5")),
+                    /* variantId = */ null,
                     /* quantity = */ 1,
                     /* price = */ BigDecimal.valueOf(20),
+                    /* imageUrl = */ null,
+                    /* description = */ null,
                     /* isReturnable = */ false
             )
     );
@@ -41,6 +49,7 @@ public class OrderFacadeTest {
 
     private static final Order ORDER_1 = new Order(
             /* orderId = */ ORDER_1_ID,
+            /* reservationId = */ null,
             /* clientId = */ CLIENT_1_ID,
             /* orderStatus = */ OrderStatus.PENDING,
             /* date = */ DATE_2025_07_10_15_00_00,
@@ -49,6 +58,7 @@ public class OrderFacadeTest {
 
     private static final Order ORDER_2 = new Order(
             /* orderId = */ ORDER_2_ID,
+            /* reservationId = */ null,
             /* clientId = */ CLIENT_2_ID,
             /* orderStatus = */ OrderStatus.PENDING,
             /* date = */ DATE_2025_07_11_15_00_00,
@@ -70,12 +80,13 @@ public class OrderFacadeTest {
 
         // when:
 
-        Order createdOrder = facade.createOrder(new OrderToCreate(CLIENT_1_ID, ITEMS), new Context(null));
+        Order createdOrder = facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS), new Context(null));
 
         // then:
         assertThat(createdOrder).isEqualTo(
                 new Order(
                         /* orderId = */ ORDER_1_ID,
+                        /* reservationId = */ RESERVATION_1_ID,
                         /* clientId = */ CLIENT_1_ID,
                         /* orderStatus = */ OrderStatus.PENDING,
                         /* date = */ DATE_2025_07_10_15_00_00,
@@ -101,7 +112,7 @@ public class OrderFacadeTest {
         // when:
         var error = assertThatThrownBy(() ->
                 // Trying to create an order with the same ID: ORDER_1_ID
-                facade.createOrder(new OrderToCreate(CLIENT_1_ID, ITEMS), new Context(null))
+                facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS), new Context(null))
         );
 
         // then:
@@ -135,6 +146,7 @@ public class OrderFacadeTest {
         assertThat(updatedOrder).isEqualTo(
                 new Order(
                         /* orderId = */ ORDER_1_ID,
+                        /* reservationId = */ null,
                         /* clientId = */ CLIENT_1_ID,
                         /* orderStatus = */ OrderStatus.PAID,
                         /* date = */ DATE_2025_07_10_15_00_00,
@@ -275,12 +287,15 @@ public class OrderFacadeTest {
         List<OrderItem> returnableItems = List.of(
                 new OrderItem(
                         new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                        null,
                         2,
                         BigDecimal.valueOf(10),
+                        null,
+                        null,
                         true
                 )
         );
-        Order returnableOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, recentDate, returnableItems);
+        Order returnableOrder = new Order(ORDER_1_ID, null, CLIENT_1_ID, OrderStatus.PAID, recentDate, returnableItems);
 
         TestOrderRepository orderRepository = new TestOrderRepository(List.of(returnableOrder));
         OrderFacade facade = new DefaultOrderFacade(
@@ -306,12 +321,15 @@ public class OrderFacadeTest {
         List<OrderItem> returnableItems = List.of(
                 new OrderItem(
                         new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                        null,
                         2,
                         BigDecimal.valueOf(10),
+                        null,
+                        null,
                         true
                 )
         );
-        Order oldOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, oldDate, returnableItems);
+        Order oldOrder = new Order(ORDER_1_ID, null, CLIENT_1_ID, OrderStatus.PAID, oldDate, returnableItems);
 
         TestOrderRepository orderRepository = new TestOrderRepository(List.of(oldOrder));
         OrderFacade facade = new DefaultOrderFacade(
@@ -337,12 +355,15 @@ public class OrderFacadeTest {
         List<OrderItem> nonReturnableItems = List.of(
                 new OrderItem(
                         new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                        null,
                         2,
                         BigDecimal.valueOf(10),
+                        null,
+                        null,
                         false // not returnable
                 )
         );
-        Order nonReturnableOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, recentDate, nonReturnableItems);
+        Order nonReturnableOrder = new Order(ORDER_1_ID, null, CLIENT_1_ID, OrderStatus.PAID, recentDate, nonReturnableItems);
 
         TestOrderRepository orderRepository = new TestOrderRepository(List.of(nonReturnableOrder));
         OrderFacade facade = new DefaultOrderFacade(
@@ -367,18 +388,24 @@ public class OrderFacadeTest {
         LocalDateTime recentDate = LocalDateTime.now().minusDays(7); // 7 days ago
         OrderItem returnableItem = new OrderItem(
                 new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                null,
                 2,
                 BigDecimal.valueOf(10),
+                null,
+                null,
                 true
         );
         OrderItem nonReturnableItem = new OrderItem(
                 new ItemId(UUID.fromString("473c1579-12b1-49b0-b90e-253782c874a5")),
+                null,
                 1,
                 BigDecimal.valueOf(20),
+                null,
+                null,
                 false
         );
         List<OrderItem> mixedItems = List.of(returnableItem, nonReturnableItem);
-        Order mixedOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, recentDate, mixedItems);
+        Order mixedOrder = new Order(ORDER_1_ID, null, CLIENT_1_ID, OrderStatus.PAID, recentDate, mixedItems);
 
         TestOrderRepository orderRepository = new TestOrderRepository(List.of(mixedOrder));
         OrderFacade facade = new DefaultOrderFacade(
@@ -403,11 +430,14 @@ public class OrderFacadeTest {
         LocalDateTime oldDate = LocalDateTime.now().minusDays(20); // 20 days ago
         OrderItem returnableItem = new OrderItem(
                 new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
+                null,
                 2,
                 BigDecimal.valueOf(10),
+                null,
+                null,
                 true
         );
-        Order oldOrder = new Order(ORDER_1_ID, CLIENT_1_ID, OrderStatus.PAID, oldDate, List.of(returnableItem));
+        Order oldOrder = new Order(ORDER_1_ID, null, CLIENT_1_ID, OrderStatus.PAID, oldDate, List.of(returnableItem));
 
         TestOrderRepository orderRepository = new TestOrderRepository(List.of(oldOrder));
         OrderFacade facade = new DefaultOrderFacade(

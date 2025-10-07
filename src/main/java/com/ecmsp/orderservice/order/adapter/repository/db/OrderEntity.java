@@ -30,6 +30,9 @@ class OrderEntity {
     @Column(name = "client_id", nullable = false)
     private UUID clientId;
 
+    @Column(name = "reservation_id")
+    private UUID reservationId;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemEntity> items;
 
@@ -74,6 +77,14 @@ class OrderEntity {
         this.items = items;
     }
 
+    public UUID getReservationId() {
+        return reservationId;
+    }
+
+    public void setReservationId(UUID reservationId) {
+        this.reservationId = reservationId;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -81,6 +92,7 @@ class OrderEntity {
                 ", orderStatus=" + orderStatus +
                 ", date=" + date +
                 ", clientId=" + clientId +
+                ", reservationId=" + reservationId +
                 '}';
     }
 }

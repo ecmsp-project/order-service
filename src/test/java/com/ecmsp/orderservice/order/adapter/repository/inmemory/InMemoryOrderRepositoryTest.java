@@ -26,6 +26,7 @@ class InMemoryOrderRepositoryTest {
 
     private static final Order ORDER_1 = new Order(
         /* orderId = */ ORDER_1_ID,
+        /* reservationId = */ null,
         /* clientId = */ CLIENT_1_ID,
         /* orderStatus = */ OrderStatus.PENDING,
         /* date = */ DATE_2025_07_10_15_00_00,
@@ -34,6 +35,7 @@ class InMemoryOrderRepositoryTest {
 
     private static final Order ORDER_2 = new Order(
         /* orderId = */ ORDER_2_ID,
+        /* reservationId = */ null,
         /* clientId = */ CLIENT_2_ID,
         /* orderStatus = */ OrderStatus.PENDING,
         /* date = */ DATE_2025_07_11_15_00_00,
@@ -146,6 +148,7 @@ class InMemoryOrderRepositoryTest {
         // and:
         Order updatedOrder = new Order(
             ORDER_1_ID,
+            null,
             CLIENT_1_ID,
             OrderStatus.PROCESSING,
             DATE_2025_07_10_15_00_00,
@@ -171,6 +174,7 @@ class InMemoryOrderRepositoryTest {
         // and:
         Order updatedOrder2 = new Order(
             ORDER_2_ID,
+            null,
             CLIENT_2_ID,
             OrderStatus.PROCESSING,
             DATE_2025_07_11_15_00_00,

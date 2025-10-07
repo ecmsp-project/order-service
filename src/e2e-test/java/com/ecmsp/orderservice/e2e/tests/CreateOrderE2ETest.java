@@ -26,17 +26,21 @@ public class CreateOrderE2ETest {
     private static final List<CartItem> ITEMS = List.of(
             new CartItem(
                     ITEM_1_ID,
+                    null,
                     "Item 1",
                     new java.math.BigDecimal("10.00"),
                     2,
+                    null,
                     "Description for Item 1",
                     false
             ),
             new CartItem(
                     ITEM_2_ID,
+                    null,
                     "Item 2",
                     new java.math.BigDecimal("20.00"),
                     1,
+                    null,
                     "Description for Item 2",
                     true
             )

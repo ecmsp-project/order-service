@@ -64,6 +64,7 @@ public class OrdersController {
     public ResponseEntity<OrderDetailsResponse> createOrder(@RequestBody CreateOrderRequest request, @RequestHeader(value = "X-Correlation-Id", required = false) String correlationId) {
         Context context = new Context(new CorrelationId(UUID.fromString(correlationId)));
         OrderToCreate orderToCreate = new OrderToCreate(
+                    null,
             /* clientId = */ new ClientId(request.clientId()),
             /* items = */ request.items().stream()
                 .map(CreateOrderRequest.Item::toOrderItem)
