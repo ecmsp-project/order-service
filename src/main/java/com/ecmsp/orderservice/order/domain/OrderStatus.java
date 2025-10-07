@@ -1,10 +1,19 @@
 package com.ecmsp.orderservice.order.domain;
 
 public enum OrderStatus {
+    UNSPECIFIED,
     PENDING,
     PROCESSING,
     PAID,
     FAILED,
     CANCELLED,
-    UNSPECIFIED // Added to match the protobuf enum
+
+    // Post-fulfillment states
+    SHIPPED,
+    DELIVERED,
+
+    // Return states
+    RETURN_REQUESTED,
+    RETURN_PROCESSING,
+    RETURNED
 }

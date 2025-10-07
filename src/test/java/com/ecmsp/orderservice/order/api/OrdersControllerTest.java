@@ -23,6 +23,7 @@ public class OrdersControllerTest {
 
     private static final Order ORDER_1 = new Order(
         /* orderId = */ new OrderId(UUID.fromString("3745fd3b-62b1-40a1-ab32-57aa2ecf562f")),
+        /* reservationId = */ null,
         /* clientId = */ new ClientId(UUID.fromString("b74d2425-a3ad-4138-ae70-3c4ecbcf5803")),
         /* orderStatus = */ OrderStatus.PENDING,
         /* date = */ LocalDateTime.of(2025, 7, 10, 15, 0, 0),
@@ -31,6 +32,7 @@ public class OrdersControllerTest {
 
     private static final Order ORDER_2 = new Order(
         /* orderId = */ new OrderId(UUID.fromString("605c2114-faaa-447d-adfd-582408389958")),
+        /* reservationId = */ null,
         /* clientId = */ new ClientId(UUID.fromString("85f30610-467c-49a1-a50a-9686aa6089dc")),
         /* orderStatus = */ OrderStatus.PENDING,
         /* date = */ LocalDateTime.of(2025, 7, 11, 6, 0, 0),

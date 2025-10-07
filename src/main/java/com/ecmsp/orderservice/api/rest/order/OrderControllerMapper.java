@@ -32,7 +32,7 @@ public class OrderControllerMapper {
                 .map(item -> new OrderReturnabilityResponse.ReturnableItemDto(
                     /* itemId = */ item.itemId().value(),
                     /* quantity = */ item.quantity(),
-                    /* priceAtTimeOfOrder = */ item.priceAtTimeOfOrder()
+                    /* price = */ item.price()
                 ))
                 .toList()
         );

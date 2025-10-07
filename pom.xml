@@ -85,9 +85,7 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-<!--        TODO: new version was uploaded to nexus but not loaded into the project - it set up manually
-            check later what went wrong and fix it
--->
+
 <!--		<dependency>-->
 <!--			<groupId>com.ecmsp</groupId>-->
 <!--			<artifactId>protos</artifactId>-->
@@ -97,7 +95,7 @@
         <dependency>
             <groupId>com.ecmsp</groupId>
             <artifactId>protos</artifactId>
-            <version>1.0.0-20251005.125206-32</version>
+            <version>1.0.0-20251007.110512-35</version>
         </dependency>
 
 

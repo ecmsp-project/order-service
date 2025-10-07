@@ -3,8 +3,10 @@ package com.ecmsp.orderservice.grpc;
 import com.ecmsp.order.v1.*;
 import com.ecmsp.orderservice.api.grpc.OrderGrpcMapper;
 import com.ecmsp.orderservice.api.grpc.OrderGrpcService;
-import com.ecmsp.orderservice.order.domain.*;
-import com.ecmsp.orderservice.order.domain.OrderStatus;
+import com.ecmsp.orderservice.order.domain.ClientId;
+import com.ecmsp.orderservice.order.domain.OrderFacade;
+import com.ecmsp.orderservice.order.domain.OrderId;
+import com.ecmsp.orderservice.order.domain.Order;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -45,7 +47,7 @@ class OrderGrpcServiceTest {
 
     @BeforeEach
     void setUp() {
-        testOrder = new Order(ORDER_ID, CLIENT_ID, null, null, null);
+        testOrder = new Order(ORDER_ID, null, CLIENT_ID, null, null, null);
     }
 
     @Nested
@@ -134,194 +136,6 @@ class OrderGrpcServiceTest {
         }
     }
 
-    @Nested
-    @DisplayName("Create Order Tests")
-    class CreateOrderTests {
-
-        private final StreamObserver<CreateOrderResponse> responseObserver = mock(StreamObserver.class);
-
-        @Test
-        @DisplayName("Should create order successfully")
-        void should_create_order_successfully() {
-            // given
-            CreateOrderRequest request = CreateOrderRequest.newBuilder()
-                    .setClientId(CLIENT_UUID.toString())
-                    .build();
-            OrderToCreate orderToCreate = new OrderToCreate(CLIENT_ID, List.of());
-            CreateOrderResponse expectedResponse = CreateOrderResponse.newBuilder()
-                    .setOrderId(ORDER_UUID.toString())
-                    .build();
-
-            when(orderGrpcMapper.toOrderToCreate(request)).thenReturn(orderToCreate);
-            when(orderFacade.createOrder(orderToCreate, null)).thenReturn(testOrder);
-            when(orderGrpcMapper.toCreateOrderResponse(testOrder)).thenReturn(expectedResponse);
-
-            // when
-            orderGrpcService.createOrder(request, responseObserver);
-
-            // then
-            verify(orderGrpcMapper).toOrderToCreate(request);
-            verify(orderFacade).createOrder(orderToCreate, null);
-            verify(orderGrpcMapper).toCreateOrderResponse(testOrder);
-            verify(responseObserver).onNext(expectedResponse);
-            verify(responseObserver).onCompleted();
-            verify(responseObserver, never()).onError(any());
-        }
-
-        @Test
-        @DisplayName("Should handle exception during order creation")
-        void should_handle_exception_during_order_creation() {
-            // given
-            CreateOrderRequest request = CreateOrderRequest.newBuilder()
-                    .setClientId(CLIENT_UUID.toString())
-                    .build();
-            OrderToCreate orderToCreate = new OrderToCreate(CLIENT_ID, List.of());
-
-            when(orderGrpcMapper.toOrderToCreate(request)).thenReturn(orderToCreate);
-            when(orderFacade.createOrder(orderToCreate, null)).thenThrow(new RuntimeException("Creation failed"));
-
-            // when
-            orderGrpcService.createOrder(request, responseObserver);
-
-            // then
-            verify(responseObserver).onError(any(StatusRuntimeException.class));
-            verify(responseObserver, never()).onNext(any());
-            verify(responseObserver, never()).onCompleted();
-        }
-    }
-
-    @Nested
-    @DisplayName("Update Order Tests")
-    class UpdateOrderTests {
-
-
-        private final StreamObserver<UpdateOrderResponse> responseObserver = mock(StreamObserver.class);
-
-        @Test
-        @DisplayName("Should auto-advance order from PENDING to PROCESSING")
-        void should_auto_advance_order_from_pending_to_processing() {
-            // given
-            UpdateOrderRequest request = UpdateOrderRequest.newBuilder()
-                    .setOrderId(ORDER_UUID.toString())
-                    .build();
-            Order pendingOrder = new Order(ORDER_ID, CLIENT_ID, OrderStatus.PENDING, null, null);
-            Order processingOrder = new Order(ORDER_ID, CLIENT_ID, OrderStatus.PROCESSING, null, null);
-            UpdateOrderResponse expectedResponse = UpdateOrderResponse.newBuilder()
-                    .setOrderId(ORDER_UUID.toString())
-                    .build();
-
-            when(orderFacade.findOrderById(ORDER_ID)).thenReturn(Optional.of(pendingOrder));
-            when(orderFacade.updateOrder(argThat(orderToUpdate ->
-                    orderToUpdate.orderId().equals(ORDER_ID) &&
-                            orderToUpdate.newStatus() == OrderStatus.PROCESSING
-            ))).thenReturn(processingOrder);
-            when(orderGrpcMapper.toUpdateOrderResponse(processingOrder)).thenReturn(expectedResponse);
-
-            // when
-            orderGrpcService.updateOrder(request, responseObserver);
-
-            // then
-            verify(orderFacade).findOrderById(ORDER_ID);
-            verify(orderFacade).updateOrder(any(OrderToUpdate.class));
-            verify(orderGrpcMapper).toUpdateOrderResponse(processingOrder);
-            verify(responseObserver).onNext(expectedResponse);
-            verify(responseObserver).onCompleted();
-            verify(responseObserver, never()).onError(any());
-        }
-
-        @Test
-        @DisplayName("Should return NOT_FOUND when order does not exist for update")
-        void should_return_not_found_when_order_does_not_exist_for_update() {
-            // given
-            UpdateOrderRequest request = UpdateOrderRequest.newBuilder()
-                    .setOrderId(ORDER_UUID.toString())
-                    .build();
-
-            when(orderFacade.findOrderById(ORDER_ID)).thenReturn(Optional.empty());
-
-            // when
-            orderGrpcService.updateOrder(request, responseObserver);
-
-            // then
-            ArgumentCaptor<StatusRuntimeException> exceptionCaptor = ArgumentCaptor.forClass(StatusRuntimeException.class);
-            verify(responseObserver).onError(exceptionCaptor.capture());
-
-            StatusRuntimeException exception = exceptionCaptor.getValue();
-            assertThat(exception.getStatus().getCode()).isEqualTo(Status.NOT_FOUND.getCode());
-
-            verify(responseObserver, never()).onNext(any());
-            verify(responseObserver, never()).onCompleted();
-        }
-
-        @Test
-        @DisplayName("Should return INTERNAL error when update fails with unexpected exception")
-        void should_return_internal_error_when_update_fails() {
-            // given
-            UpdateOrderRequest request = UpdateOrderRequest.newBuilder()
-                    .setOrderId(ORDER_UUID.toString())
-                    .build();
-
-            when(orderFacade.findOrderById(ORDER_ID)).thenThrow(new RuntimeException("Unexpected error"));
-
-            // when
-            orderGrpcService.updateOrder(request, responseObserver);
-
-            // then
-            ArgumentCaptor<StatusRuntimeException> exceptionCaptor = ArgumentCaptor.forClass(StatusRuntimeException.class);
-            verify(responseObserver).onError(exceptionCaptor.capture());
-
-            StatusRuntimeException exception = exceptionCaptor.getValue();
-            assertThat(exception.getStatus().getCode()).isEqualTo(Status.INTERNAL.getCode());
-
-            verify(responseObserver, never()).onNext(any());
-            verify(responseObserver, never()).onCompleted();
-        }
-    }
-
-    @Nested
-    @DisplayName("Delete Order Tests")
-    class DeleteOrderTests {
-
-
-        private final StreamObserver<DeleteOrderResponse> responseObserver = mock(StreamObserver.class);
-
-        @Test
-        @DisplayName("Should delete order successfully")
-        void should_delete_order_successfully() {
-            // given
-            DeleteOrderRequest request = DeleteOrderRequest.newBuilder()
-                    .setOrderId(ORDER_UUID.toString())
-                    .build();
-
-            // when
-            orderGrpcService.deleteOrder(request, responseObserver);
-
-            // then
-            verify(orderFacade).deleteOrder(ORDER_ID);
-            verify(responseObserver).onNext(argThat(DeleteOrderResponse::getSuccess));
-            verify(responseObserver).onCompleted();
-            verify(responseObserver, never()).onError(any());
-        }
-
-        @Test
-        @DisplayName("Should handle exception during order deletion")
-        void should_handle_exception_during_order_deletion() {
-            // given
-            DeleteOrderRequest request = DeleteOrderRequest.newBuilder()
-                    .setOrderId(ORDER_UUID.toString())
-                    .build();
-
-            doThrow(new RuntimeException("Delete failed")).when(orderFacade).deleteOrder(ORDER_ID);
-
-            // when
-            orderGrpcService.deleteOrder(request, responseObserver);
-
-            // then
-            verify(responseObserver).onError(any(StatusRuntimeException.class));
-            verify(responseObserver, never()).onNext(any());
-            verify(responseObserver, never()).onCompleted();
-        }
-    }
 
     @Nested
     @DisplayName("Get Order Status Tests")

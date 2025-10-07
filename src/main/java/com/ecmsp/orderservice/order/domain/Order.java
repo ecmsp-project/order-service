@@ -7,14 +7,19 @@ import java.util.List;
 
 public record Order(
     OrderId orderId,
+    ReservationId reservationId,
     ClientId clientId,
     OrderStatus orderStatus,
     LocalDateTime date,
     List<OrderItem> items
 ) {
+
+    private static final int RETURNABLE_PERIOD_DAYS = 14;
+
+
     public BigDecimal totalPrice() {
         return items.stream()
-                .map(OrderItem::priceAtTimeOfOrder)
+                .map(OrderItem::price)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -23,7 +28,7 @@ public record Order(
     }
 
     public boolean isWithinReturnPeriod() {
-        return ChronoUnit.DAYS.between(date, LocalDateTime.now()) <= 14;
+        return ChronoUnit.DAYS.between(date, LocalDateTime.now()) <= RETURNABLE_PERIOD_DAYS;
     }
 
     public boolean hasReturnableItems() {
