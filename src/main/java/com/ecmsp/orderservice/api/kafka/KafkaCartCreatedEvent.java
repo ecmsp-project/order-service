@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-public record CartCreatedEvent(
+public record KafkaCartCreatedEvent(
         String clientId,
         List<CartItem> items
 ) {
@@ -24,7 +24,7 @@ public record CartCreatedEvent(
     ) {
     }
 
-    public static OrderToCreate toOrder(CartCreatedEvent cartEvent) {
+    public static OrderToCreate toOrder(KafkaCartCreatedEvent cartEvent) {
         return new OrderToCreate(
                 /* reservationId */ null,
                 /* clientId */ new ClientId(UUID.fromString(cartEvent.clientId())),

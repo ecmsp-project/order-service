@@ -46,6 +46,6 @@ To publish a test message to Kafka topic via Kafka UI, follow these steps:
    deserialize the event from JSON payload properly. Example:
    ```json
     {
-      "__TypeId__": "com.ecmsp.orderservice.api.kafka.PaymentProcessedKafkaEventSucceeded"
+      "__TypeId__": "com.ecmsp.orderservice.api.kafka.KafkaPaymentProcessedSucceededEvent"
     }
     ```

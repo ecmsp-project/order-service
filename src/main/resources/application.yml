@@ -29,8 +29,6 @@ spring:
 order:
   repository:
     type: db
-  payment-client:
-    type: kafka
   event-publisher:
     type: kafka
   id-generator:
@@ -41,7 +39,7 @@ kafka:
   topic:
     payment-processed-succeeded: payment-processed-succeeded
     payment-processed-failed: payment-processed-failed
-    payment-request: payment-request
+    order-created: order-created
     order-status-updated: order-status-updated
     cart-event: cart-event
 

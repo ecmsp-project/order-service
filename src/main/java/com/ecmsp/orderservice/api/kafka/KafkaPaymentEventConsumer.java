@@ -23,7 +23,7 @@ public class KafkaPaymentEventConsumer {
 
 
     @KafkaListener(topics = "${kafka.topic.payment-processed-succeeded}")
-    public void consume(@Payload PaymentProcessedKafkaEventSucceeded paymentProcessedKafkaEventSucceeded) {
+    public void consume(@Payload KafkaPaymentProcessedSucceededEvent paymentProcessedKafkaEventSucceeded) {
         orderFacade.updateOrder(
                 new OrderToUpdate(
                         new OrderId(UUID.fromString(paymentProcessedKafkaEventSucceeded.orderId())),
@@ -34,7 +34,7 @@ public class KafkaPaymentEventConsumer {
 
 
     @KafkaListener(topics = "${kafka.topic.payment-processed-failed}")
-    public void consume(PaymentProcessedKafkaEventFailed paymentProcessedKafkaEventFailed) {
+    public void consume(KafkaPaymentProcessedFailedEvent paymentProcessedKafkaEventFailed) {
         orderFacade.updateOrder(
                 new OrderToUpdate(
                         new OrderId(UUID.fromString(paymentProcessedKafkaEventFailed.orderId())),

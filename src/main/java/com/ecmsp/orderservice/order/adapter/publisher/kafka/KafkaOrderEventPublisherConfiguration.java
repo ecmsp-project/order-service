@@ -14,8 +14,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 public class KafkaOrderEventPublisherConfiguration {
 
     @Bean
-    public KafkaOrderEventPublisher kafkaOrderEventPublisher(KafkaTemplate<String, KafkaOrderStatusUpdatedEvent> kafkaTemplate) {
-        return new KafkaOrderEventPublisher(kafkaTemplate);
+    public KafkaOrderEventPublisher kafkaOrderEventPublisher(
+            KafkaTemplate<String, KafkaOrderStatusUpdatedEvent> orderStatusUpdatedKafkaTemplate,
+            KafkaTemplate<String, KafkaOrderCreatedEvent> orderCreatedKafkaTemplate
+    ) {
+        return new KafkaOrderEventPublisher(orderStatusUpdatedKafkaTemplate, orderCreatedKafkaTemplate);
     }
 
 }

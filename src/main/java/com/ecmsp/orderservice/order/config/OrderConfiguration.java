@@ -18,7 +18,6 @@ class OrderConfiguration {
     OrderFacade orderFacade(
         OrderRepository orderRepository,
         OrderIdGenerator orderIdGenerator,
-        PaymentClient paymentEventPublisher,
         OrderEventPublisher orderEventPublisher,
         OrderReturnabilityService orderReturnabilityService,
         Clock clock
@@ -26,7 +25,6 @@ class OrderConfiguration {
         return new DefaultOrderFacade(
             /* orderRepository = */ orderRepository,
             /* orderIdGenerator = */ orderIdGenerator,
-            /* paymentEventPublisher = */ paymentEventPublisher,
             /* orderEventPublisher = */ orderEventPublisher,
             /* orderReturnService = */ orderReturnabilityService,
             /* clock = */ clock

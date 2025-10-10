@@ -10,8 +10,6 @@ spring:
 order:
   repository:
     type: db
-  payment-client:
-    type: in-memory
   event-publisher:
     type: in-memory
 

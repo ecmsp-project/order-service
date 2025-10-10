@@ -72,7 +72,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -103,7 +102,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -128,7 +126,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -162,7 +159,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -186,7 +182,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -206,7 +201,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -227,7 +221,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -247,7 +240,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -267,7 +259,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
@@ -301,7 +292,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.systemDefaultZone()
@@ -335,7 +325,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.systemDefaultZone()
@@ -369,7 +358,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.systemDefaultZone()
@@ -411,7 +399,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.systemDefaultZone()
@@ -443,7 +430,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.systemDefaultZone()
@@ -463,7 +449,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.systemDefaultZone()
@@ -483,7 +468,6 @@ public class OrderFacadeTest {
         OrderFacade facade = new DefaultOrderFacade(
                 orderRepository,
                 (correlationId) -> ORDER_1_ID,
-                new TestPaymentEventPublisher(),
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
                 Clock.systemDefaultZone()
