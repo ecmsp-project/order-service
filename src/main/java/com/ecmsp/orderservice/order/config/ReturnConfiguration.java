@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Clock;
 
 @Configuration
-public class ReturnConfiguration {
+class ReturnConfiguration {
 
     @Bean
     ReturnFacade returnFacade(

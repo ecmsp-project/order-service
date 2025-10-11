@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-public class KafkaCartEventConsumer{
+class KafkaCartEventConsumer{
 
     private final OrderFacade orderFacade;
 

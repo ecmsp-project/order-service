@@ -12,7 +12,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @Configuration
 @Profile("dev")
-public class DevPostgreSQLConfiguration {
+class DevPostgreSQLConfiguration {
 
     @Bean
     @ServiceConnection

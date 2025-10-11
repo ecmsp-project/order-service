@@ -12,7 +12,7 @@ import java.util.UUID;
 
 
 @Component
-public class KafkaPaymentEventConsumer {
+class KafkaPaymentEventConsumer {
 
     private final OrderFacade orderFacade;
 

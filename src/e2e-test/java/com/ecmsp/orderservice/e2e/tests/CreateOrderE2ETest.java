@@ -10,7 +10,7 @@ import static com.ecmsp.orderservice.api.kafka.KafkaCartCreatedEvent.CartItem;
 import static com.ecmsp.orderservice.e2e.E2ETestEnvironment.*;
 
 
-public class CreateOrderE2ETest {
+class CreateOrderE2ETest {
 
     private static final String CLIENT_ID = "b5d1eec8-c3ea-4b55-8cec-900b5c018381";
     private static final String ITEM_1_ID = "a1d1eec8-c3ea-4b55-8cec-900b5c018381";

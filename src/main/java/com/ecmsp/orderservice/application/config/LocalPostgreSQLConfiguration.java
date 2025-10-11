@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @Profile("local")
-public class LocalPostgreSQLConfiguration {
+class LocalPostgreSQLConfiguration {
 
     @Bean
     @ServiceConnection

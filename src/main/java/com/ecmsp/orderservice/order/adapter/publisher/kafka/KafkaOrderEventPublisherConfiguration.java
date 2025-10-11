@@ -11,7 +11,7 @@ import org.springframework.kafka.core.KafkaTemplate;
         prefix = "order.event-publisher",
         name = "type",
         havingValue = "kafka")
-public class KafkaOrderEventPublisherConfiguration {
+class KafkaOrderEventPublisherConfiguration {
 
     @Bean
     public KafkaOrderEventPublisher kafkaOrderEventPublisher(
