@@ -3,3 +3,18 @@ order:
     type: in-memory
   id-generator:
     type: fixed
+  event-publisher:
+    type: kafka
+
+return:
+  repository:
+    type: in-memory
+  id-generator:
+    type: fixed
+
+kafka:
+  topic:
+    payment-processed-succeeded: payment-processed-succeeded
+    payment-processed-failed: payment-processed-failed
+    order-created: order-created
+    order-status-updated: order-status-updated

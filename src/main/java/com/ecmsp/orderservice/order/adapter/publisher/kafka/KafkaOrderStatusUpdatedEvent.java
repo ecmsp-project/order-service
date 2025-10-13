@@ -1,6 +1,6 @@
 package com.ecmsp.orderservice.order.adapter.publisher.kafka;
 
-record KafkaOrderStatusUpdatedEvent(
+public record KafkaOrderStatusUpdatedEvent(
         String orderId,
         String status
 ) {
