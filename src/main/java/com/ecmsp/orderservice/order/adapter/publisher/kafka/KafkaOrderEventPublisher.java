@@ -13,8 +13,6 @@ class KafkaOrderEventPublisher implements OrderEventPublisher {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-
-    //TODO only orderCreatedEvent is needed there won't be sending any statusUpdatedEvent so it should be removed
     private final KafkaTemplate<String, KafkaOrderStatusUpdatedEvent> statusUpdatedKafkaTemplate;
 
 
@@ -65,7 +63,7 @@ class KafkaOrderEventPublisher implements OrderEventPublisher {
             String eventJson = objectMapper.writeValueAsString(event);
             kafkaTemplate.send(topic, key, eventJson);
         } catch (JsonProcessingException e) {
-            // TODO: handle error
+            throw new RuntimeException("Failed to serialize event", e);
         }
     }
 }

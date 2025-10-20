@@ -42,7 +42,7 @@ To publish a test message to Kafka topic via Kafka UI, follow these steps:
         "orderId": "550e8400-e29b-41d4-a716-446655440001",
         "clientId": "123e4567-e89b-12d3-a456-426614174001",
         "orderTotal": 284.97,
-        "requestedAt": "2024-01-15T10:30:00Z"
+        "requestedAt": "2024-01-15T10:30:00"
     }
 ```
    
