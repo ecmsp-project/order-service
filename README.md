@@ -36,7 +36,7 @@ To publish a test message to Kafka topic via Kafka UI, follow these steps:
 6. In the `Key` field, enter the key identifier for your message
 7. In the `Value` field, enter the message content in JSON format. Example"
    
-8.
+8. In payload section add
 ```json
     {
         "orderId": "550e8400-e29b-41d4-a716-446655440001",
@@ -46,13 +46,10 @@ To publish a test message to Kafka topic via Kafka UI, follow these steps:
     }
 ```
    
-7. In the `Headers` section, you need to provide FQDN of the class representing the event, so that service can
-   deserialize the event from JSON payload properly. Example:
-   
-```json
-    
-{
-"__TypeId__": "com.ecmsp.orderservice.order.adapter.publisher.kafka.KafkaOrderCreatedEvent"
-}
+7. In the `Headers` section you can add correlationId for tracing
 
+```json
+    {
+      "X-Correlation-Id": "550e8400-e29b-41d4-a716-446655440001"
+    }
 ```
