@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class ReturnGrpcMapper {
+class ReturnGrpcMapper {
 
     public GetReturnResponse toGetReturnResponse(ReturnOrder returnOrder) {
         return GetReturnResponse.newBuilder()

@@ -1,6 +1,6 @@
 package com.ecmsp.orderservice.api.kafka;
 
-public record PaymentProcessedKafkaEventSucceeded(
+record KafkaPaymentProcessedSucceededEvent(
         String orderId,
         String paymentId,
         String processedAt

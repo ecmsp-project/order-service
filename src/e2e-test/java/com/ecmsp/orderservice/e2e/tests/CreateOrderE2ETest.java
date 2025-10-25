@@ -1,21 +1,16 @@
 package com.ecmsp.orderservice.e2e.tests;
 
-import com.ecmsp.order.v1.GetOrderResponse;
-import com.ecmsp.order.v1.OrderItemDetails;
-import com.ecmsp.orderservice.api.kafka.CartCreatedEvent;
 import com.ecmsp.orderservice.e2e.utils.InternalOrderApi;
 import com.ecmsp.orderservice.e2e.utils.KafkaApi;
 import com.ecmsp.orderservice.e2e.utils.OrderServiceApi;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.ecmsp.orderservice.api.kafka.CartCreatedEvent.CartItem;
+import static com.ecmsp.orderservice.api.kafka.KafkaCartCreatedEvent.CartItem;
 import static com.ecmsp.orderservice.e2e.E2ETestEnvironment.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class CreateOrderE2ETest {
+class CreateOrderE2ETest {
 
     private static final String CLIENT_ID = "b5d1eec8-c3ea-4b55-8cec-900b5c018381";
     private static final String ITEM_1_ID = "a1d1eec8-c3ea-4b55-8cec-900b5c018381";

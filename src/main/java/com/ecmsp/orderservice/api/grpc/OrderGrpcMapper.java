@@ -15,7 +15,7 @@ import static com.ecmsp.orderservice.order.domain.OrderStatus.*;
 
 
 @Component
-public class OrderGrpcMapper {
+class OrderGrpcMapper {
 
     public GetOrderResponse toOrderResponse(Order order) {
         List<OrderItemDetails> itemDetails = order.items().stream()

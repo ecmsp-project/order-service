@@ -9,7 +9,6 @@ public class DefaultOrderFacade implements OrderFacade {
 
     private final OrderRepository orderRepository;
     private final OrderIdGenerator orderIdGenerator;
-    private final PaymentClient paymentClient;
     private final OrderEventPublisher orderEventPublisher;
     private final OrderReturnabilityService orderReturnabilityService;
     private final Clock clock;
@@ -17,14 +16,12 @@ public class DefaultOrderFacade implements OrderFacade {
     public DefaultOrderFacade(
             OrderRepository orderRepository,
             OrderIdGenerator orderIdGenerator,
-            PaymentClient paymentEventPublisher,
             OrderEventPublisher orderEventPublisher,
             OrderReturnabilityService orderReturnabilityService,
             Clock clock
     ) {
         this.orderRepository = orderRepository;
         this.orderIdGenerator = orderIdGenerator;
-        this.paymentClient = paymentEventPublisher;
         this.orderEventPublisher = orderEventPublisher;
         this.orderReturnabilityService = orderReturnabilityService;
         this.clock = clock;
@@ -52,14 +49,17 @@ public class DefaultOrderFacade implements OrderFacade {
 
         orderRepository.create(order);
 
-        PaymentToCreate paymentToCreate = new PaymentToCreate(
+
+        // event consumed by payment service
+        OrderEvent.OrderCreated orderCreatedEvent = new OrderEvent.OrderCreated(
                 order.orderId(),
                 order.clientId(),
                 order.totalPrice(),
                 LocalDateTime.now(clock)
         );
 
-        paymentClient.createPayment(paymentToCreate);
+
+        orderEventPublisher.publish(orderCreatedEvent);
 
         return order;
     }
@@ -79,6 +79,8 @@ public class DefaultOrderFacade implements OrderFacade {
 
 
         orderRepository.update(updatedOrder);
+
+        // event consumed by product service
         orderEventPublisher.publish(
                 new OrderEvent.OrderStatusUpdated(
                         updatedOrder.orderId(),

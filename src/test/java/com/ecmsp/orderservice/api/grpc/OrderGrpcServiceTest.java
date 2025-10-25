@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.grpc;
+package com.ecmsp.orderservice.api.grpc;
 
 import com.ecmsp.order.v1.*;
 import com.ecmsp.orderservice.api.grpc.OrderGrpcMapper;

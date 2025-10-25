@@ -1,22 +1,18 @@
+
 package com.ecmsp.orderservice.application.config;
 
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
-import org.flywaydb.core.Flyway;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import javax.sql.DataSource;
-
 @Configuration
-@Profile("local")
-class LocalPostgreSQLConfiguration {
+@Profile("dev")
+class DevPostgreSQLConfiguration {
 
     @Bean
     @ServiceConnection

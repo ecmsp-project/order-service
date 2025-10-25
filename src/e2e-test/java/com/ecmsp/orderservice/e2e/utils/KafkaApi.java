@@ -1,6 +1,6 @@
 package com.ecmsp.orderservice.e2e.utils;
 
-import com.ecmsp.orderservice.api.kafka.CartCreatedEvent;
+import com.ecmsp.orderservice.api.kafka.KafkaCartCreatedEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -32,11 +32,11 @@ public class KafkaApi {
     }
 
 
-    public void sendEvent(CartCreatedEvent event, String correlationId) {
+    public void sendEvent(KafkaCartCreatedEvent event, String correlationId) {
         try {
             String eventJson = objectMapper.writeValueAsString(event);
             sendEvent("cart-event", String.valueOf(UUID.randomUUID()), eventJson, List.of(
-                    new RecordHeader("__TypeId__", CartCreatedEvent.class.getCanonicalName().getBytes()),
+                    new RecordHeader("__TypeId__", KafkaCartCreatedEvent.class.getCanonicalName().getBytes()),
                     new RecordHeader("X-Correlation-Id", correlationId.getBytes())
             ));
             System.out.println("Sent CartCreatedEvent: " + eventJson);

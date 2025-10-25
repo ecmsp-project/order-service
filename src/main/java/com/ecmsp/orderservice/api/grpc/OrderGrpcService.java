@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @GrpcService
-public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
+class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
     private final OrderFacade orderFacade;
     private final OrderGrpcMapper orderGrpcMapper;
 

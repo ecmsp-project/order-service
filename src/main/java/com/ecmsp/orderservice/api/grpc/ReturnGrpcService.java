@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @GrpcService
-public class ReturnGrpcService extends ReturnServiceGrpc.ReturnServiceImplBase {
+class ReturnGrpcService extends ReturnServiceGrpc.ReturnServiceImplBase {
 
     private final ReturnFacade returnFacade;
     private final ReturnGrpcMapper returnGrpcMapper;
