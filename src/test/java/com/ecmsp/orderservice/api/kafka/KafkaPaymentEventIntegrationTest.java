@@ -3,6 +3,7 @@ package com.ecmsp.orderservice.api.kafka;
 import com.ecmsp.orderservice.order.domain.*;
 import com.ecmsp.orderservice.order.adapter.publisher.kafka.KafkaOrderCreatedEvent;
 import com.ecmsp.orderservice.order.adapter.publisher.kafka.KafkaOrderStatusUpdatedEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,13 +57,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class KafkaPaymentEventIntegrationTest {
 
     @Autowired
-    private KafkaTemplate<String, KafkaPaymentProcessedSucceededEvent> paymentSucceededTemplate;
-
-    @Autowired
-    private KafkaTemplate<String, KafkaPaymentProcessedFailedEvent> paymentFailedTemplate;
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
     private OrderFacade orderFacade;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
@@ -90,14 +91,27 @@ class KafkaPaymentEventIntegrationTest {
         private final BlockingQueue<KafkaOrderCreatedEvent> orderCreatedRecords = new LinkedBlockingQueue<>();
         private final BlockingQueue<KafkaOrderStatusUpdatedEvent> orderStatusUpdatedRecords = new LinkedBlockingQueue<>();
 
+        @Autowired
+        private com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+
         @KafkaListener(topics = "order-created", groupId = "test-order-created-consumer")
-        public void consumeOrderCreated(@Payload KafkaOrderCreatedEvent event) {
-            orderCreatedRecords.add(event);
+        public void consumeOrderCreated(@Payload String eventJson) {
+            try {
+                KafkaOrderCreatedEvent event = objectMapper.readValue(eventJson, KafkaOrderCreatedEvent.class);
+                orderCreatedRecords.add(event);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to deserialize KafkaOrderCreatedEvent", e);
+            }
         }
 
         @KafkaListener(topics = "order-status-updated", groupId = "test-order-status-updated-consumer")
-        public void consumeOrderStatusUpdated(@Payload KafkaOrderStatusUpdatedEvent event) {
-            orderStatusUpdatedRecords.add(event);
+        public void consumeOrderStatusUpdated(@Payload String eventJson) {
+            try {
+                KafkaOrderStatusUpdatedEvent event = objectMapper.readValue(eventJson, KafkaOrderStatusUpdatedEvent.class);
+                orderStatusUpdatedRecords.add(event);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to deserialize KafkaOrderStatusUpdatedEvent", e);
+            }
         }
 
         public KafkaOrderCreatedEvent pollOrderCreated(long timeout, TimeUnit unit) throws InterruptedException {
@@ -117,7 +131,6 @@ class KafkaPaymentEventIntegrationTest {
     @Test
     void should_update_order_to_paid_and_publish_status_updated_event_when_payment_succeeded_event_consumed() throws Exception {
         // Given: Create an order with PENDING status
-        OrderId orderId = new OrderId(UUID.randomUUID());
         ClientId clientId = new ClientId(UUID.randomUUID());
 
         OrderToCreate orderToCreate = new OrderToCreate(
@@ -151,8 +164,9 @@ class KafkaPaymentEventIntegrationTest {
                 LocalDateTime.now().toString()
         );
 
-        paymentSucceededTemplate.send("payment-processed-succeeded", paymentEvent.orderId(), paymentEvent);
-        paymentSucceededTemplate.flush();
+        String paymentEventJson = objectMapper.writeValueAsString(paymentEvent);
+        kafkaTemplate.send("payment-processed-succeeded", paymentEvent.orderId(), paymentEventJson);
+        kafkaTemplate.flush();
 
         // Then: Verify order status is updated to PAID
         Thread.sleep(2000); // Wait for async processing
@@ -172,7 +186,6 @@ class KafkaPaymentEventIntegrationTest {
     @Test
     void should_update_order_to_failed_and_publish_status_updated_event_when_payment_failed_event_consumed() throws Exception {
         // Given: Create an order with PENDING status
-        OrderId orderId = new OrderId(UUID.randomUUID());
         ClientId clientId = new ClientId(UUID.randomUUID());
 
         OrderToCreate orderToCreate = new OrderToCreate(
@@ -206,8 +219,9 @@ class KafkaPaymentEventIntegrationTest {
                 LocalDateTime.now().toString()
         );
 
-        paymentFailedTemplate.send("payment-processed-failed", paymentEvent.orderId(), paymentEvent);
-        paymentFailedTemplate.flush();
+        String paymentEventJson = objectMapper.writeValueAsString(paymentEvent);
+        kafkaTemplate.send("payment-processed-failed", paymentEvent.orderId(), paymentEventJson);
+        kafkaTemplate.flush();
 
         // Then: Verify order status is updated to FAILED
         Thread.sleep(2000); // Wait for async processing
@@ -231,7 +245,6 @@ class KafkaPaymentEventIntegrationTest {
         BigDecimal itemPrice = new BigDecimal("50.00");
         int quantity = 3;
         // Note: totalPrice() in Order just sums prices without multiplying by quantity
-        BigDecimal expectedTotal = itemPrice;
 
         OrderToCreate orderToCreate = new OrderToCreate(
                 null,
@@ -259,7 +272,7 @@ class KafkaPaymentEventIntegrationTest {
         assertThat(event).isNotNull();
         assertThat(event.orderId()).isEqualTo(createdOrder.orderId().value().toString());
         assertThat(event.clientId()).isEqualTo(clientId.value().toString());
-        assertThat(event.orderTotal()).isEqualByComparingTo(expectedTotal);
+        assertThat(event.orderTotal()).isEqualByComparingTo(itemPrice);
         assertThat(event.requestedAt()).isNotNull();
     }
 }
