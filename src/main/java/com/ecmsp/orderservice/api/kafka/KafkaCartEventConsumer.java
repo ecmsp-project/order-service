@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+
+@Deprecated
 @Slf4j
 @Component
 class KafkaCartEventConsumer{

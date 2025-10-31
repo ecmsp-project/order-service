@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 
+//TODO: update it for product -> cart communication
+@Deprecated
 public record KafkaCartCreatedEvent(
         String clientId,
         List<CartItem> items
