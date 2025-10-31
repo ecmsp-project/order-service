@@ -47,6 +47,10 @@ public class DefaultOrderFacade implements OrderFacade {
                 /* items */ orderToCreate.items()
         );
 
+        /*
+        TODO: should be sent grpc request to product service to make reservation and whether product variants are accessible
+        */
+
         orderRepository.create(order);
 
 
