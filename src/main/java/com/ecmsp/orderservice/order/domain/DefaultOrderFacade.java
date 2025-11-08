@@ -1,5 +1,8 @@
 package com.ecmsp.orderservice.order.domain;
 
+import com.ecmsp.orderservice.order.domain.reservation.ReservationClient;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationCreated;
+
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,6 +14,8 @@ public class DefaultOrderFacade implements OrderFacade {
     private final OrderIdGenerator orderIdGenerator;
     private final OrderEventPublisher orderEventPublisher;
     private final OrderReturnabilityService orderReturnabilityService;
+    private final ReservationClient reservationClient;
+    private final OrderMapper orderMapper;
     private final Clock clock;
 
     public DefaultOrderFacade(
@@ -18,12 +23,15 @@ public class DefaultOrderFacade implements OrderFacade {
             OrderIdGenerator orderIdGenerator,
             OrderEventPublisher orderEventPublisher,
             OrderReturnabilityService orderReturnabilityService,
+            ReservationClient reservationClient, OrderMapper orderMapper,
             Clock clock
     ) {
         this.orderRepository = orderRepository;
         this.orderIdGenerator = orderIdGenerator;
         this.orderEventPublisher = orderEventPublisher;
         this.orderReturnabilityService = orderReturnabilityService;
+        this.reservationClient = reservationClient;
+        this.orderMapper = orderMapper;
         this.clock = clock;
     }
 
@@ -38,21 +46,36 @@ public class DefaultOrderFacade implements OrderFacade {
 
     public Order createOrder(OrderToCreate orderToCreate) {
 
+        OrderId orderId = orderIdGenerator.generate(null); //generate random UUID
+
         Order order = new Order(
-                /* orderId */ orderIdGenerator.generate(null), //generate random UUID
-                        orderToCreate.reservationId(), //TODO: should be removed
+                /* orderId */ orderId,
+                /* reservationId */ orderToCreate.reservationId(), //TODO: should be removed
                 /* clientId */ orderToCreate.clientId(),
-                /* orderStatus */ OrderStatus.PENDING, // Assuming default status is PENDING
+                /* orderStatus */ OrderStatus.PENDING,
                 /* date */ LocalDateTime.now(clock),
                 /* items */ orderToCreate.items()
         );
 
-        /*
-        TODO: should be sent grpc request to product service to make reservation and whether product variants are accessible
-        */
+        ReservationCreated reservationCreated = reservationClient.createReservation(orderMapper.toReservationToCreate(order));
+
+        // Check if any variants failed to be reserved (insufficient stock)
+        if(!reservationCreated.variantsOutOfStock().isEmpty()) {
+            var failedVariants = reservationCreated.variantsOutOfStock().stream()
+                    .map(variant -> "Variant %s: requested %d, available %d".formatted(
+                            variant.variantId(),
+                            variant.requestedQuantity(),
+                            variant.availableQuantity()
+                    ))
+                    .toList();
+
+            throw new OrderException.ItemsNotAvailable(
+                    "Some variants do not have sufficient stock.",
+                    failedVariants.toString()
+            );
+        }
 
         orderRepository.create(order);
-
 
         // event consumed by payment service
         OrderEvent.OrderCreated orderCreatedEvent = new OrderEvent.OrderCreated(
@@ -61,7 +84,6 @@ public class DefaultOrderFacade implements OrderFacade {
                 order.totalPrice(),
                 LocalDateTime.now(clock)
         );
-
 
         orderEventPublisher.publish(orderCreatedEvent);
 

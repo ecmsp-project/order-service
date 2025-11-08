@@ -1,6 +1,7 @@
 package com.ecmsp.orderservice.order.adapter.repository.db;
 
 import com.ecmsp.orderservice.order.domain.*;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationId;
 
 import java.util.List;
 

@@ -4,6 +4,7 @@ import com.ecmsp.order.v1.*;
 import com.ecmsp.orderservice.order.domain.*;
 import com.ecmsp.orderservice.order.domain.Order;
 import com.ecmsp.orderservice.order.domain.OrderStatus;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationId;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

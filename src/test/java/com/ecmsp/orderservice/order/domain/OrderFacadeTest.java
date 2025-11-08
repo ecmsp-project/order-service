@@ -1,4 +1,9 @@
 package com.ecmsp.orderservice.order.domain;
+
+import com.ecmsp.orderservice.order.domain.reservation.ReservationClient;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationCreated;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationId;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationToCreate;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -25,7 +30,7 @@ public class OrderFacadeTest {
     private static final List<OrderItem> ITEMS = List.of(
             new OrderItem(
                     /* itemId = */ new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
-                    /* variantId = */ null,
+                    /* variantId = */ new VariantId(UUID.fromString("a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d")),
                     /* name = */ "Test Item 1",
                     /* quantity = */ 2,
                     /* price = */ BigDecimal.valueOf(10),
@@ -35,7 +40,7 @@ public class OrderFacadeTest {
             ),
             new OrderItem(
                     /* itemId = */ new ItemId(UUID.fromString("473c1579-12b1-49b0-b90e-253782c874a5")),
-                    /* variantId = */ null,
+                    /* variantId = */ new VariantId(UUID.fromString("b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e")),
                     /* name = */ "Test Item 2",
                     /* quantity = */ 1,
                     /* price = */ BigDecimal.valueOf(20),
@@ -76,6 +81,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -106,6 +113,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -121,6 +130,37 @@ public class OrderFacadeTest {
     }
 
     @Test
+    void should_fail_when_create_order_with_insufficient_stock() {
+        // given:
+        VariantId outOfStockVariantId = new VariantId(UUID.fromString("a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"));
+        List<ReservationCreated.VariantOutOfStock> outOfStockVariants = List.of(
+                new ReservationCreated.VariantOutOfStock(outOfStockVariantId, 2, 1)
+        );
+
+        TestOrderRepository orderRepository = new TestOrderRepository(Collections.emptyList());
+        OrderFacade facade = new DefaultOrderFacade(
+                orderRepository,
+                (correlationId) -> ORDER_1_ID,
+                new TestOrderEventPublisher(),
+                new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(outOfStockVariants),
+                new OrderMapper(),
+                Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
+        );
+
+        // when:
+        var error = assertThatThrownBy(() ->
+                facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS))
+        );
+
+        // then:
+        error.isInstanceOf(OrderException.ItemsNotAvailable.class);
+        error.hasMessageContaining("Items not available");
+        error.hasMessageContaining("Variant " + outOfStockVariantId);
+        error.hasMessageContaining("requested 2, available 1");
+    }
+
+    @Test
     void should_update_order() {
 
         // given:
@@ -130,6 +170,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -163,6 +205,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -186,6 +230,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -205,6 +251,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -225,6 +273,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -244,6 +294,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -263,6 +315,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.fixed(DATE_2025_07_10_15_00_00.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
         );
 
@@ -280,7 +334,7 @@ public class OrderFacadeTest {
         List<OrderItem> returnableItems = List.of(
                 new OrderItem(
                         new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
-                        null,
+                        new VariantId(UUID.fromString("a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d")),
                         "Test Item",
                         2,
                         BigDecimal.valueOf(10),
@@ -297,6 +351,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.systemDefaultZone()
         );
 
@@ -314,7 +370,7 @@ public class OrderFacadeTest {
         List<OrderItem> returnableItems = List.of(
                 new OrderItem(
                         new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
-                        null,
+                        new VariantId(UUID.fromString("a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d")),
                         "Test Item",
                         2,
                         BigDecimal.valueOf(10),
@@ -331,6 +387,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.systemDefaultZone()
         );
 
@@ -365,6 +423,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.systemDefaultZone()
         );
 
@@ -381,7 +441,7 @@ public class OrderFacadeTest {
         LocalDateTime recentDate = LocalDateTime.now().minusDays(7); // 7 days ago
         OrderItem returnableItem = new OrderItem(
                 new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
-                null,
+                new VariantId(UUID.fromString("a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d")),
                 "Test Item 1",
                 2,
                 BigDecimal.valueOf(10),
@@ -391,7 +451,7 @@ public class OrderFacadeTest {
         );
         OrderItem nonReturnableItem = new OrderItem(
                 new ItemId(UUID.fromString("473c1579-12b1-49b0-b90e-253782c874a5")),
-                null,
+                new VariantId(UUID.fromString("b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e")),
                 "Test Item 2",
                 1,
                 BigDecimal.valueOf(20),
@@ -408,6 +468,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.systemDefaultZone()
         );
 
@@ -440,6 +502,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.systemDefaultZone()
         );
 
@@ -459,6 +523,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.systemDefaultZone()
         );
 
@@ -478,6 +544,8 @@ public class OrderFacadeTest {
                 (correlationId) -> ORDER_1_ID,
                 new TestOrderEventPublisher(),
                 new OrderReturnabilityService(orderRepository),
+                new TestReservationClient(),
+                new OrderMapper(),
                 Clock.systemDefaultZone()
         );
 
@@ -486,6 +554,29 @@ public class OrderFacadeTest {
 
         // then:
         assertThat(returnableItems).isEmpty();
+    }
+
+    // Test helper class for ReservationClient
+    private static class TestReservationClient implements ReservationClient {
+        private final List<ReservationCreated.VariantOutOfStock> variantsOutOfStock;
+
+        public TestReservationClient() {
+            this(Collections.emptyList());
+        }
+
+        public TestReservationClient(List<ReservationCreated.VariantOutOfStock> variantsOutOfStock) {
+            this.variantsOutOfStock = variantsOutOfStock;
+        }
+
+        @Override
+        public ReservationCreated createReservation(ReservationToCreate reservationToCreate) {
+            // Extract variant IDs from the reservation request
+            List<VariantId> reservedVariantIds = reservationToCreate.variantsToReserve().stream()
+                    .map(ReservationToCreate.VariantToReserve::variantId)
+                    .toList();
+
+            return new ReservationCreated(reservedVariantIds, variantsOutOfStock);
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package com.ecmsp.orderservice.order.domain;
 
+import com.ecmsp.orderservice.order.domain.reservation.ReservationId;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

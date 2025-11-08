@@ -1,6 +1,7 @@
 package com.ecmsp.orderservice.order.config;
 
 import com.ecmsp.orderservice.order.domain.*;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,11 +16,19 @@ class OrderConfiguration {
     }
 
     @Bean
+    OrderMapper orderMapper() {
+        return new OrderMapper();
+    }
+
+
+    @Bean
     OrderFacade orderFacade(
         OrderRepository orderRepository,
         OrderIdGenerator orderIdGenerator,
         OrderEventPublisher orderEventPublisher,
         OrderReturnabilityService orderReturnabilityService,
+        ReservationClient reservationClient,
+        OrderMapper orderMapper,
         Clock clock
     ) {
         return new DefaultOrderFacade(
@@ -27,6 +36,8 @@ class OrderConfiguration {
             /* orderIdGenerator = */ orderIdGenerator,
             /* orderEventPublisher = */ orderEventPublisher,
             /* orderReturnService = */ orderReturnabilityService,
+            /* reservationClient = */ reservationClient,
+            /* orderMapper = */ orderMapper,
             /* clock = */ clock
         );
     }

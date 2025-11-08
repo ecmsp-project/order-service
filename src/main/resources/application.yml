@@ -48,6 +48,10 @@ grpc:
     port: 7300
     security:
       enabled: false # Set to true to enable TLS
+  client:
+    product-service:
+      address: ${PRODUCT_SERVICE_GRPC_URL:static://localhost:7200}
+      negotiationType: plaintext
 
 server:
   port: 8300

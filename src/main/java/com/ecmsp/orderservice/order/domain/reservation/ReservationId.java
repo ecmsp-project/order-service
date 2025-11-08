@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.order.domain;
+package com.ecmsp.orderservice.order.domain.reservation;
 
 import java.util.UUID;
 
