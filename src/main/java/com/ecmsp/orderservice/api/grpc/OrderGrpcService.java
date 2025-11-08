@@ -4,9 +4,7 @@ import com.ecmsp.order.v1.*;
 import com.ecmsp.order.v1.OrderServiceGrpc;
 import com.ecmsp.orderservice.application.security.grpc.UserContextGrpcHolder;
 import com.ecmsp.orderservice.application.security.UserContextData;
-import com.ecmsp.orderservice.order.domain.ClientId;
-import com.ecmsp.orderservice.order.domain.OrderFacade;
-import com.ecmsp.orderservice.order.domain.OrderId;
+import com.ecmsp.orderservice.order.domain.*;
 import com.ecmsp.orderservice.order.domain.Order;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -24,6 +22,8 @@ class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
         this.orderFacade = orderFacade;
         this.orderGrpcMapper = orderGrpcMapper;
     }
+
+
 
     @Override
     public void getOrder(GetOrderRequest request, StreamObserver<GetOrderResponse> responseObserver) {
@@ -109,4 +109,25 @@ class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
         }
     }
 
+    @Override
+    public void createOrder(CreateOrderRequest request, StreamObserver<CreateOrderResponse> responseObserver) {
+        try {
+            UserContextData userContextData = UserContextGrpcHolder.getUserContext();
+            ClientId clientId = new ClientId(UUID.fromString(userContextData.userId()));
+
+            OrderToCreate orderToCreate = orderGrpcMapper.toOrderToCreate(clientId, request);
+            Order order = orderFacade.createOrder(orderToCreate);
+
+            CreateOrderResponse createOrderResponse = CreateOrderResponse.newBuilder()
+                    .setOrderId(order.orderId().value().toString())
+                    .build();
+
+            responseObserver.onNext(createOrderResponse);
+            responseObserver.onCompleted();
+
+
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
 }

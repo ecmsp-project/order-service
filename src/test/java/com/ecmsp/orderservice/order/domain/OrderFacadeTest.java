@@ -26,6 +26,7 @@ public class OrderFacadeTest {
             new OrderItem(
                     /* itemId = */ new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
                     /* variantId = */ null,
+                    /* name = */ "Test Item 1",
                     /* quantity = */ 2,
                     /* price = */ BigDecimal.valueOf(10),
                     /* imageUrl = */ null,
@@ -35,6 +36,7 @@ public class OrderFacadeTest {
             new OrderItem(
                     /* itemId = */ new ItemId(UUID.fromString("473c1579-12b1-49b0-b90e-253782c874a5")),
                     /* variantId = */ null,
+                    /* name = */ "Test Item 2",
                     /* quantity = */ 1,
                     /* price = */ BigDecimal.valueOf(20),
                     /* imageUrl = */ null,
@@ -79,7 +81,7 @@ public class OrderFacadeTest {
 
         // when:
 
-        Order createdOrder = facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS), new Context(null));
+        Order createdOrder = facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS));
 
         // then:
         assertThat(createdOrder).isEqualTo(
@@ -110,7 +112,7 @@ public class OrderFacadeTest {
         // when:
         var error = assertThatThrownBy(() ->
                 // Trying to create an order with the same ID: ORDER_1_ID
-                facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS), new Context(null))
+                facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS))
         );
 
         // then:
@@ -279,6 +281,7 @@ public class OrderFacadeTest {
                 new OrderItem(
                         new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
                         null,
+                        "Test Item",
                         2,
                         BigDecimal.valueOf(10),
                         null,
@@ -312,6 +315,7 @@ public class OrderFacadeTest {
                 new OrderItem(
                         new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
                         null,
+                        "Test Item",
                         2,
                         BigDecimal.valueOf(10),
                         null,
@@ -345,6 +349,7 @@ public class OrderFacadeTest {
                 new OrderItem(
                         new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
                         null,
+                        "Test Item",
                         2,
                         BigDecimal.valueOf(10),
                         null,
@@ -377,6 +382,7 @@ public class OrderFacadeTest {
         OrderItem returnableItem = new OrderItem(
                 new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
                 null,
+                "Test Item 1",
                 2,
                 BigDecimal.valueOf(10),
                 null,
@@ -386,6 +392,7 @@ public class OrderFacadeTest {
         OrderItem nonReturnableItem = new OrderItem(
                 new ItemId(UUID.fromString("473c1579-12b1-49b0-b90e-253782c874a5")),
                 null,
+                "Test Item 2",
                 1,
                 BigDecimal.valueOf(20),
                 null,
@@ -418,6 +425,7 @@ public class OrderFacadeTest {
         OrderItem returnableItem = new OrderItem(
                 new ItemId(UUID.fromString("66d155e8-2d57-44fa-9adc-580e1e4f9cc9")),
                 null,
+                "Test Item",
                 2,
                 BigDecimal.valueOf(10),
                 null,

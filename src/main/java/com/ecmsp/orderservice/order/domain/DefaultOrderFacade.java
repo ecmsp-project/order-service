@@ -36,11 +36,11 @@ public class DefaultOrderFacade implements OrderFacade {
     }
 
 
-    public Order createOrder(OrderToCreate orderToCreate, Context context) {
+    public Order createOrder(OrderToCreate orderToCreate) {
 
         Order order = new Order(
-                /* orderId */ orderIdGenerator.generate(context.correlationId()),
-                        orderToCreate.reservationId(),
+                /* orderId */ orderIdGenerator.generate(null), //generate random UUID
+                        orderToCreate.reservationId(), //TODO: should be removed
                 /* clientId */ orderToCreate.clientId(),
                 /* orderStatus */ OrderStatus.PENDING, // Assuming default status is PENDING
                 /* date */ LocalDateTime.now(clock),

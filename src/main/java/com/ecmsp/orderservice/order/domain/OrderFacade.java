@@ -9,7 +9,8 @@ public interface OrderFacade {
 
     Optional<Order> findOrderById(OrderId orderId);
 
-    Order createOrder(OrderToCreate orderToCreate, Context context);
+    //Context can be added if needed for tracing/logging
+    Order createOrder(OrderToCreate orderToCreate);
 
     Order updateOrder(OrderToUpdate orderToUpdate);
 

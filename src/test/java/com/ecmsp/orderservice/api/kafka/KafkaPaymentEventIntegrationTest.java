@@ -140,6 +140,7 @@ class KafkaPaymentEventIntegrationTest {
                         new OrderItem(
                                 new ItemId(UUID.randomUUID()),
                                 new VariantId(UUID.randomUUID()),
+                                "name",
                                 2,
                                 new BigDecimal("100.00"),
                                 null,
@@ -150,7 +151,7 @@ class KafkaPaymentEventIntegrationTest {
         );
 
         Context context = new Context(new CorrelationId(UUID.randomUUID()));
-        Order createdOrder = orderFacade.createOrder(orderToCreate, context);
+        Order createdOrder = orderFacade.createOrder(orderToCreate);
 
         assertThat(createdOrder.orderStatus()).isEqualTo(OrderStatus.PENDING);
 
@@ -195,6 +196,7 @@ class KafkaPaymentEventIntegrationTest {
                         new OrderItem(
                                 new ItemId(UUID.randomUUID()),
                                 new VariantId(UUID.randomUUID()),
+                                "name",
                                 1,
                                 new BigDecimal("100.00"),
                                 null,
@@ -205,7 +207,7 @@ class KafkaPaymentEventIntegrationTest {
         );
 
         Context context = new Context(new CorrelationId(UUID.randomUUID()));
-        Order createdOrder = orderFacade.createOrder(orderToCreate, context);
+        Order createdOrder = orderFacade.createOrder(orderToCreate);
 
         assertThat(createdOrder.orderStatus()).isEqualTo(OrderStatus.PENDING);
 
@@ -253,6 +255,7 @@ class KafkaPaymentEventIntegrationTest {
                         new OrderItem(
                                 new ItemId(UUID.randomUUID()),
                                 new VariantId(UUID.randomUUID()),
+                                "name",
                                 quantity,
                                 itemPrice,
                                 null,
@@ -265,7 +268,7 @@ class KafkaPaymentEventIntegrationTest {
         Context context = new Context(new CorrelationId(UUID.randomUUID()));
 
         // When: Create order
-        Order createdOrder = orderFacade.createOrder(orderToCreate, context);
+        Order createdOrder = orderFacade.createOrder(orderToCreate);
 
         // Then: Verify OrderCreatedEvent is published to Kafka
         KafkaOrderCreatedEvent event = testEventListener.pollOrderCreated(10, TimeUnit.SECONDS);

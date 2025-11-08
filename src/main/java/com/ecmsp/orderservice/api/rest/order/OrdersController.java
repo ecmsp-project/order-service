@@ -71,7 +71,7 @@ public class OrdersController {
                 .toList()
         );
 
-        Order order = orderFacade.createOrder(orderToCreate, context);
+        Order order = orderFacade.createOrder(orderToCreate);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.toOrderDetailsResponse(order));
     }
 

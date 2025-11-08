@@ -17,6 +17,7 @@ class OrderEntityMapper {
             .map(item -> new OrderItem(
                 new ItemId(item.getItemId()),
                 item.getVariantId() != null ? new VariantId(item.getVariantId()) : null,
+                item.getName(),
                 item.getQuantity(),
                 item.getPrice(),
                 item.getImageUrl(),

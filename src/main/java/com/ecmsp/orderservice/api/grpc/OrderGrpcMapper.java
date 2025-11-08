@@ -1,15 +1,14 @@
 package com.ecmsp.orderservice.api.grpc;
 
-import com.ecmsp.order.v1.GetOrderItemsResponse;
-import com.ecmsp.order.v1.GetOrderResponse;
-import com.ecmsp.order.v1.GetOrderStatusResponse;
-import com.ecmsp.order.v1.OrderItemDetails;
+import com.ecmsp.order.v1.*;
+import com.ecmsp.orderservice.order.domain.*;
 import com.ecmsp.orderservice.order.domain.Order;
-import com.ecmsp.orderservice.order.domain.OrderItem;
 import com.ecmsp.orderservice.order.domain.OrderStatus;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static com.ecmsp.orderservice.order.domain.OrderStatus.*;
 
@@ -91,19 +90,48 @@ class OrderGrpcMapper {
                 .build();
     }
 
+
+    public OrderToCreate toOrderToCreate(ClientId clientId, CreateOrderRequest createOrderRequest){
+
+        List<OrderItem> itemsList = createOrderRequest.getItemsList().stream()
+                .map(this::toOrderItem)
+                .toList();
+        return new OrderToCreate(
+                new ReservationId(UUID.randomUUID()), //TODO: should be removed it's only placeholder
+                clientId,
+                itemsList
+        );
+    }
+
+
+
     private OrderItemDetails toOrderItemDetails(OrderItem item) {
         return OrderItemDetails.newBuilder()
                 .setItemId(item.itemId().toString())
                 .setVariantId(item.variantId().toString())
+                .setName(item.name())
                 .setQuantity(item.quantity())
                 .setPrice(item.price().doubleValue())
                 .setIsReturnable(item.isReturnable())
                 .setImageUrl(item.imageUrl())
                 .setVariantId(item.variantId().toString())
                 .build();
-
-
     }
+
+    private OrderItem toOrderItem(OrderItemDetails orderItemDetails){
+        return new OrderItem(
+                new ItemId(UUID.fromString(orderItemDetails.getItemId())),
+                new VariantId(UUID.fromString(orderItemDetails.getVariantId())),
+                orderItemDetails.getName(),
+                orderItemDetails.getQuantity(),
+                BigDecimal.valueOf(orderItemDetails.getPrice()),
+                orderItemDetails.getImageUrl(),
+                orderItemDetails.getDescription(),
+                orderItemDetails.getIsReturnable()
+        );
+    }
+
+
 
 
 }
