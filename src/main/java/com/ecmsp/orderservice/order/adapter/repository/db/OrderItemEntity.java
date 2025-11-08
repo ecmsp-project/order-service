@@ -25,7 +25,7 @@ class OrderItemEntity {
     @Column(name = "variant_id")
     private UUID variantId;
 
-    @Column(name = "name")
+    @Column(name = "item_name")
     private String name;
 
     @Column(name = "quantity", nullable = false)
