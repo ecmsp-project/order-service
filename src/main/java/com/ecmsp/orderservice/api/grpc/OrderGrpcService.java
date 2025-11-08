@@ -23,8 +23,6 @@ class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
         this.orderGrpcMapper = orderGrpcMapper;
     }
 
-
-
     @Override
     public void getOrder(GetOrderRequest request, StreamObserver<GetOrderResponse> responseObserver) {
         try {
@@ -116,11 +114,9 @@ class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
             ClientId clientId = new ClientId(UUID.fromString(userContextData.userId()));
 
             OrderToCreate orderToCreate = orderGrpcMapper.toOrderToCreate(clientId, request);
-            Order order = orderFacade.createOrder(orderToCreate);
+            OrderCreated orderCreated = orderFacade.createOrder(orderToCreate);
 
-            CreateOrderResponse createOrderResponse = CreateOrderResponse.newBuilder()
-                    .setOrderId(order.orderId().value().toString())
-                    .build();
+            CreateOrderResponse createOrderResponse = orderGrpcMapper.toCreateOrderResponse(orderCreated);
 
             responseObserver.onNext(createOrderResponse);
             responseObserver.onCompleted();

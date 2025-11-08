@@ -44,7 +44,7 @@ public class DefaultOrderFacade implements OrderFacade {
     }
 
 
-    public Order createOrder(OrderToCreate orderToCreate) {
+    public OrderCreated createOrder(OrderToCreate orderToCreate) {
 
         OrderId orderId = orderIdGenerator.generate(null); //generate random UUID
 
@@ -60,34 +60,28 @@ public class DefaultOrderFacade implements OrderFacade {
         ReservationCreated reservationCreated = reservationClient.createReservation(orderMapper.toReservationToCreate(order));
 
         // Check if any variants failed to be reserved (insufficient stock)
-        if(!reservationCreated.variantsOutOfStock().isEmpty()) {
-            var failedVariants = reservationCreated.variantsOutOfStock().stream()
-                    .map(variant -> "Variant %s: requested %d, available %d".formatted(
-                            variant.variantId(),
-                            variant.requestedQuantity(),
-                            variant.availableQuantity()
-                    ))
-                    .toList();
+        boolean isReservationSuccessful = reservationCreated.variantsOutOfStock().isEmpty();
+        if(isReservationSuccessful){
+            orderRepository.create(order);
 
-            throw new OrderException.ItemsNotAvailable(
-                    "Some variants do not have sufficient stock.",
-                    failedVariants.toString()
+            // event consumed by payment service
+            OrderEvent.OrderCreated orderCreatedEvent = new OrderEvent.OrderCreated(
+                    order.orderId(),
+                    order.clientId(),
+                    order.totalPrice(),
+                    LocalDateTime.now(clock)
             );
+
+            orderEventPublisher.publish(orderCreatedEvent);
         }
 
-        orderRepository.create(order);
-
-        // event consumed by payment service
-        OrderEvent.OrderCreated orderCreatedEvent = new OrderEvent.OrderCreated(
-                order.orderId(),
-                order.clientId(),
-                order.totalPrice(),
-                LocalDateTime.now(clock)
+        return new OrderCreated(
+                isReservationSuccessful,
+                isReservationSuccessful ? orderId : null,
+                reservationCreated
         );
 
-        orderEventPublisher.publish(orderCreatedEvent);
 
-        return order;
     }
 
     public Order updateOrder(OrderToUpdate orderToUpdate) {

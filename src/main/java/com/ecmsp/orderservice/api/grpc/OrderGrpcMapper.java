@@ -4,6 +4,7 @@ import com.ecmsp.order.v1.*;
 import com.ecmsp.orderservice.order.domain.*;
 import com.ecmsp.orderservice.order.domain.Order;
 import com.ecmsp.orderservice.order.domain.OrderStatus;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationCreated;
 import com.ecmsp.orderservice.order.domain.reservation.ReservationId;
 import org.springframework.stereotype.Component;
 
@@ -102,6 +103,32 @@ class OrderGrpcMapper {
                 clientId,
                 itemsList
         );
+    }
+
+
+    public CreateOrderResponse toCreateOrderResponse(OrderCreated orderCreated) {
+        return CreateOrderResponse.newBuilder()
+                .setIsSuccess(orderCreated.isCreatedSuccessfully())
+                .setOrderId(orderCreated.orderId() != null ? orderCreated.orderId().value().toString() : "")
+                .addAllReservedVariantIds(
+                        orderCreated.reservationCreated().reservedVariantIds().stream()
+                                .map(variantId -> variantId.value().toString())
+                                .toList()
+                )
+                .addAllFailedVariants(
+                        orderCreated.reservationCreated().variantsOutOfStock().stream()
+                                .map(this::toFailedReservationVariant)
+                                .toList()
+                )
+                .build();
+    }
+
+    private FailedReservationVariant toFailedReservationVariant(ReservationCreated.VariantOutOfStock variantOutOfStock) {
+        return FailedReservationVariant.newBuilder()
+                .setVariantId(variantOutOfStock.variantId().value().toString())
+                .setRequestedQuantity(variantOutOfStock.requestedQuantity())
+                .setAvailableQuantity(variantOutOfStock.availableQuantity())
+                .build();
     }
 
 

@@ -71,7 +71,13 @@ public class OrdersController {
                 .toList()
         );
 
-        Order order = orderFacade.createOrder(orderToCreate);
+        OrderCreated orderCreated = orderFacade.createOrder(orderToCreate);
+
+        if (!orderCreated.isCreatedSuccessfully()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        Order order = orderFacade.findOrderById(orderCreated.orderId()).orElseThrow();
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.toOrderDetailsResponse(order));
     }
 

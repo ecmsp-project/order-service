@@ -88,10 +88,16 @@ public class OrderFacadeTest {
 
         // when:
 
-        Order createdOrder = facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS));
+        OrderCreated orderCreated = facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS));
 
         // then:
-        assertThat(createdOrder).isEqualTo(
+        assertThat(orderCreated.isCreatedSuccessfully()).isTrue();
+        assertThat(orderCreated.orderId()).isEqualTo(ORDER_1_ID);
+        assertThat(orderCreated.reservationCreated().variantsOutOfStock()).isEmpty();
+
+        // Verify order was persisted
+        Order persistedOrder = orderRepository.findById(ORDER_1_ID).orElseThrow();
+        assertThat(persistedOrder).isEqualTo(
                 new Order(
                         /* orderId = */ ORDER_1_ID,
                         /* reservationId = */ RESERVATION_1_ID,
@@ -130,7 +136,7 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void should_fail_when_create_order_with_insufficient_stock() {
+    void should_return_failure_result_when_create_order_with_insufficient_stock() {
         // given:
         VariantId outOfStockVariantId = new VariantId(UUID.fromString("a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"));
         List<ReservationCreated.VariantOutOfStock> outOfStockVariants = List.of(
@@ -149,15 +155,20 @@ public class OrderFacadeTest {
         );
 
         // when:
-        var error = assertThatThrownBy(() ->
-                facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS))
-        );
+        OrderCreated orderCreated = facade.createOrder(new OrderToCreate(RESERVATION_1_ID, CLIENT_1_ID, ITEMS));
 
         // then:
-        error.isInstanceOf(OrderException.ItemsNotAvailable.class);
-        error.hasMessageContaining("Items not available");
-        error.hasMessageContaining("Variant " + outOfStockVariantId);
-        error.hasMessageContaining("requested 2, available 1");
+        assertThat(orderCreated.isCreatedSuccessfully()).isFalse();
+        assertThat(orderCreated.orderId()).isNull();
+        assertThat(orderCreated.reservationCreated().variantsOutOfStock()).hasSize(1);
+
+        ReservationCreated.VariantOutOfStock failedVariant = orderCreated.reservationCreated().variantsOutOfStock().get(0);
+        assertThat(failedVariant.variantId()).isEqualTo(outOfStockVariantId);
+        assertThat(failedVariant.requestedQuantity()).isEqualTo(2);
+        assertThat(failedVariant.availableQuantity()).isEqualTo(1);
+
+        // Verify order was NOT persisted
+        assertThat(orderRepository.findById(ORDER_1_ID)).isEmpty();
     }
 
     @Test
