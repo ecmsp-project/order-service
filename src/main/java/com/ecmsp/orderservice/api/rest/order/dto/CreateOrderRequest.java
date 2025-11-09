@@ -18,6 +18,7 @@ public record CreateOrderRequest(
     public record Item(
             UUID itemId,
             UUID variantId,
+            String name,
             int quantity,
             double price,
             String imageUrl,
@@ -28,6 +29,7 @@ public record CreateOrderRequest(
             return new OrderItem(
                 new ItemId(itemId),
                 new VariantId(variantId),
+                name,
                 quantity,
                 BigDecimal.valueOf(price),
                 imageUrl,

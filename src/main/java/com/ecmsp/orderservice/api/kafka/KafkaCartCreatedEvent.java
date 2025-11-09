@@ -34,6 +34,7 @@ public record KafkaCartCreatedEvent(
                 .map(cartItem -> new OrderItem(
                         new ItemId(UUID.fromString(cartItem.itemId())),
                         new VariantId(UUID.fromString(cartItem.variantId())),
+                        cartItem.name(),
                         cartItem.quantity(),
                         cartItem.price(),
                         cartItem.imageUrl(),

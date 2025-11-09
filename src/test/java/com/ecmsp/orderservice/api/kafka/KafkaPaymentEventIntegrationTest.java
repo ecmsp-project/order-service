@@ -1,5 +1,6 @@
 package com.ecmsp.orderservice.api.kafka;
 
+import com.ecmsp.orderservice.order.config.TestReservationClientConfiguration;
 import com.ecmsp.orderservice.order.domain.*;
 import com.ecmsp.orderservice.order.adapter.publisher.kafka.KafkaOrderCreatedEvent;
 import com.ecmsp.orderservice.order.adapter.publisher.kafka.KafkaOrderStatusUpdatedEvent;
@@ -53,7 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
         "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}"
 })
-@Import(KafkaPaymentEventIntegrationTest.TestKafkaEventListener.class)
+@Import({KafkaPaymentEventIntegrationTest.TestKafkaEventListener.class, TestReservationClientConfiguration.class})
 class KafkaPaymentEventIntegrationTest {
 
     @Autowired
@@ -140,6 +141,7 @@ class KafkaPaymentEventIntegrationTest {
                         new OrderItem(
                                 new ItemId(UUID.randomUUID()),
                                 new VariantId(UUID.randomUUID()),
+                                "name",
                                 2,
                                 new BigDecimal("100.00"),
                                 null,
@@ -150,8 +152,10 @@ class KafkaPaymentEventIntegrationTest {
         );
 
         Context context = new Context(new CorrelationId(UUID.randomUUID()));
-        Order createdOrder = orderFacade.createOrder(orderToCreate, context);
+        OrderCreated orderCreated = orderFacade.createOrder(orderToCreate);
 
+        assertThat(orderCreated.isCreatedSuccessfully()).isTrue();
+        Order createdOrder = orderFacade.findOrderById(orderCreated.orderId()).orElseThrow();
         assertThat(createdOrder.orderStatus()).isEqualTo(OrderStatus.PENDING);
 
         // Clear the OrderCreated event from the queue
@@ -195,6 +199,7 @@ class KafkaPaymentEventIntegrationTest {
                         new OrderItem(
                                 new ItemId(UUID.randomUUID()),
                                 new VariantId(UUID.randomUUID()),
+                                "name",
                                 1,
                                 new BigDecimal("100.00"),
                                 null,
@@ -205,8 +210,10 @@ class KafkaPaymentEventIntegrationTest {
         );
 
         Context context = new Context(new CorrelationId(UUID.randomUUID()));
-        Order createdOrder = orderFacade.createOrder(orderToCreate, context);
+        OrderCreated orderCreated = orderFacade.createOrder(orderToCreate);
 
+        assertThat(orderCreated.isCreatedSuccessfully()).isTrue();
+        Order createdOrder = orderFacade.findOrderById(orderCreated.orderId()).orElseThrow();
         assertThat(createdOrder.orderStatus()).isEqualTo(OrderStatus.PENDING);
 
         // Clear the OrderCreated event from the queue
@@ -253,6 +260,7 @@ class KafkaPaymentEventIntegrationTest {
                         new OrderItem(
                                 new ItemId(UUID.randomUUID()),
                                 new VariantId(UUID.randomUUID()),
+                                "name",
                                 quantity,
                                 itemPrice,
                                 null,
@@ -265,12 +273,15 @@ class KafkaPaymentEventIntegrationTest {
         Context context = new Context(new CorrelationId(UUID.randomUUID()));
 
         // When: Create order
-        Order createdOrder = orderFacade.createOrder(orderToCreate, context);
+        OrderCreated orderCreated = orderFacade.createOrder(orderToCreate);
+
+        assertThat(orderCreated.isCreatedSuccessfully()).isTrue();
+        OrderId createdOrderId = orderCreated.orderId();
 
         // Then: Verify OrderCreatedEvent is published to Kafka
         KafkaOrderCreatedEvent event = testEventListener.pollOrderCreated(10, TimeUnit.SECONDS);
         assertThat(event).isNotNull();
-        assertThat(event.orderId()).isEqualTo(createdOrder.orderId().value().toString());
+        assertThat(event.orderId()).isEqualTo(createdOrderId.value().toString());
         assertThat(event.clientId()).isEqualTo(clientId.value().toString());
         assertThat(event.orderTotal()).isEqualByComparingTo(itemPrice);
         assertThat(event.requestedAt()).isNotNull();

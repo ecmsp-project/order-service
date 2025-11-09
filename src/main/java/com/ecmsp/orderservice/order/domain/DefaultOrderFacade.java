@@ -1,5 +1,7 @@
 package com.ecmsp.orderservice.order.domain;
 
+import com.ecmsp.orderservice.order.domain.reservation.ReservationClient;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationCreated;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
@@ -13,6 +15,8 @@ public class DefaultOrderFacade implements OrderFacade {
     private final OrderIdGenerator orderIdGenerator;
     private final OrderEventPublisher orderEventPublisher;
     private final OrderReturnabilityService orderReturnabilityService;
+    private final ReservationClient reservationClient;
+    private final OrderMapper orderMapper;
     private final Clock clock;
 
     public DefaultOrderFacade(
@@ -20,12 +24,15 @@ public class DefaultOrderFacade implements OrderFacade {
             OrderIdGenerator orderIdGenerator,
             OrderEventPublisher orderEventPublisher,
             OrderReturnabilityService orderReturnabilityService,
+            ReservationClient reservationClient, OrderMapper orderMapper,
             Clock clock
     ) {
         this.orderRepository = orderRepository;
         this.orderIdGenerator = orderIdGenerator;
         this.orderEventPublisher = orderEventPublisher;
         this.orderReturnabilityService = orderReturnabilityService;
+        this.reservationClient = reservationClient;
+        this.orderMapper = orderMapper;
         this.clock = clock;
     }
     @Transactional
@@ -38,36 +45,47 @@ public class DefaultOrderFacade implements OrderFacade {
     }
 
 
-    public Order createOrder(OrderToCreate orderToCreate, Context context) {
+    public OrderCreated createOrder(OrderToCreate orderToCreate) {
+
+        System.out.println("Creating order for client: " + orderToCreate.clientId());
+        OrderId orderId = orderIdGenerator.generate(null); //generate random UUID
 
         Order order = new Order(
-                /* orderId */ orderIdGenerator.generate(context.correlationId()),
-                        orderToCreate.reservationId(),
+                /* orderId */ orderId,
+                /* reservationId */ orderToCreate.reservationId(), //TODO: should be removed
                 /* clientId */ orderToCreate.clientId(),
-                /* orderStatus */ OrderStatus.PENDING, // Assuming default status is PENDING
+                /* orderStatus */ OrderStatus.PENDING,
                 /* date */ LocalDateTime.now(clock),
                 /* items */ orderToCreate.items()
         );
 
-        /*
-        TODO: should be sent grpc request to product service to make reservation and whether product variants are accessible
-        */
+        System.out.println("Call reservation service to reserve variants for order: " + orderId);
+        ReservationCreated reservationCreated = reservationClient.createReservation(orderMapper.toReservationToCreate(order));
+        System.out.println("Reservation service responded for order: " + orderId);
 
-        orderRepository.create(order);
+        // Check if any variants failed to be reserved (insufficient stock)
+        boolean isReservationSuccessful = reservationCreated.variantsOutOfStock().isEmpty();
+        if(isReservationSuccessful){
+            orderRepository.create(order);
 
+            // event consumed by payment service
+            OrderEvent.OrderCreated orderCreatedEvent = new OrderEvent.OrderCreated(
+                    order.orderId(),
+                    order.clientId(),
+                    order.totalPrice(),
+                    LocalDateTime.now(clock)
+            );
 
-        // event consumed by payment service
-        OrderEvent.OrderCreated orderCreatedEvent = new OrderEvent.OrderCreated(
-                order.orderId(),
-                order.clientId(),
-                order.totalPrice(),
-                LocalDateTime.now(clock)
+            orderEventPublisher.publish(orderCreatedEvent);
+        }
+
+        return new OrderCreated(
+                isReservationSuccessful,
+                isReservationSuccessful ? orderId : null,
+                reservationCreated
         );
 
 
-        orderEventPublisher.publish(orderCreatedEvent);
-
-        return order;
     }
 
     public Order updateOrder(OrderToUpdate orderToUpdate) {

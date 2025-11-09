@@ -86,17 +86,11 @@
 		</dependency>
 
 
-<!--		<dependency>-->
-<!--			<groupId>com.ecmsp</groupId>-->
-<!--			<artifactId>protos</artifactId>-->
-<!--			<version>1.0.0-SNAPSHOT</version>-->
-<!--		</dependency>-->
-
-        <dependency>
-            <groupId>com.ecmsp</groupId>
-            <artifactId>protos</artifactId>
-            <version>1.0.0-20251109.153010-49</version>
-        </dependency>
+		<dependency>
+			<groupId>com.ecmsp</groupId>
+			<artifactId>protos</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 
 
 		<dependency>

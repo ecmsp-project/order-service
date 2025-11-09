@@ -25,6 +25,9 @@ class OrderItemEntity {
     @Column(name = "variant_id")
     private UUID variantId;
 
+    @Column(name = "item_name")
+    private String name;
+
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
@@ -59,6 +62,14 @@ class OrderItemEntity {
 
     public void setOrder(OrderEntity order) {
         this.order = order;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getQuantity() {

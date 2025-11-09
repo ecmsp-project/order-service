@@ -34,7 +34,7 @@ class KafkaCartEventConsumer{
 
             OrderToCreate orderToCreate = cartEvent.toOrder(cartEvent);
             Context context = new Context(new CorrelationId(UUID.fromString(correlationId)));
-            orderFacade.createOrder(orderToCreate, context);
+            orderFacade.createOrder(orderToCreate);
 
             MDC.clear();
             log.info("Finished processing cart event - CorrelationID: {}", correlationId);

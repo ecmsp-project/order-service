@@ -1,6 +1,7 @@
 package com.ecmsp.orderservice.order.adapter.repository.db;
 
 import com.ecmsp.orderservice.order.domain.*;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationId;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ class OrderEntityMapper {
             .map(item -> new OrderItem(
                 new ItemId(item.getItemId()),
                 item.getVariantId() != null ? new VariantId(item.getVariantId()) : null,
+                item.getName(),
                 item.getQuantity(),
                 item.getPrice(),
                 item.getImageUrl(),
@@ -40,6 +42,7 @@ class OrderEntityMapper {
             .map(item -> OrderItemEntity.builder()
                 .itemId(item.itemId().value())
                 .variantId(item.variantId() != null ? item.variantId().value() : null)
+                .name(item.name() != null ? item.name() : null)
                 .quantity(item.quantity())
                 .price(item.price())
                 .imageUrl(item.imageUrl())

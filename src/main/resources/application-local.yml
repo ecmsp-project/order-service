@@ -13,3 +13,9 @@ order:
   event-publisher:
     type: in-memory
 
+grpc:
+  client:
+    product-service:
+      address: static://localhost:7400
+      negotiationType: plaintext
+

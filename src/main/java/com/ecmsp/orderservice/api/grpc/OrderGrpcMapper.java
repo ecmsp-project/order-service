@@ -1,15 +1,16 @@
 package com.ecmsp.orderservice.api.grpc;
 
-import com.ecmsp.order.v1.GetOrderItemsResponse;
-import com.ecmsp.order.v1.GetOrderResponse;
-import com.ecmsp.order.v1.GetOrderStatusResponse;
-import com.ecmsp.order.v1.OrderItemDetails;
+import com.ecmsp.order.v1.*;
+import com.ecmsp.orderservice.order.domain.*;
 import com.ecmsp.orderservice.order.domain.Order;
-import com.ecmsp.orderservice.order.domain.OrderItem;
 import com.ecmsp.orderservice.order.domain.OrderStatus;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationCreated;
+import com.ecmsp.orderservice.order.domain.reservation.ReservationId;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static com.ecmsp.orderservice.order.domain.OrderStatus.*;
 
@@ -92,19 +93,79 @@ class OrderGrpcMapper {
                 .build();
     }
 
+
+    public OrderToCreate toOrderToCreate(ClientId clientId, CreateOrderRequest createOrderRequest){
+        System.out.println("Mapping CreateOrderRequest to OrderToCreate: " + createOrderRequest);
+
+        List<OrderItem> itemsList = createOrderRequest.getItemsList().stream()
+                .map(this::toOrderItem)
+                .toList();
+
+        OrderToCreate orderToCreate = new OrderToCreate(
+                new ReservationId(UUID.randomUUID()), //TODO: should be removed it's only placeholder
+                clientId,
+                itemsList
+        );
+
+        System.out.println("Mapped OrderToCreate: " + orderToCreate);
+        return orderToCreate;
+    }
+
+
+    public CreateOrderResponse toCreateOrderResponse(OrderCreated orderCreated) {
+        return CreateOrderResponse.newBuilder()
+                .setIsSuccess(orderCreated.isCreatedSuccessfully())
+                .setOrderId(orderCreated.orderId() != null ? orderCreated.orderId().value().toString() : "")
+                .addAllReservedVariantIds(
+                        orderCreated.reservationCreated().reservedVariantIds().stream()
+                                .map(variantId -> variantId.value().toString())
+                                .toList()
+                )
+                .addAllFailedVariants(
+                        orderCreated.reservationCreated().variantsOutOfStock().stream()
+                                .map(this::toFailedReservationVariant)
+                                .toList()
+                )
+                .build();
+    }
+
+    private FailedReservationVariant toFailedReservationVariant(ReservationCreated.VariantOutOfStock variantOutOfStock) {
+        return FailedReservationVariant.newBuilder()
+                .setVariantId(variantOutOfStock.variantId().value().toString())
+                .setRequestedQuantity(variantOutOfStock.requestedQuantity())
+                .setAvailableQuantity(variantOutOfStock.availableQuantity())
+                .build();
+    }
+
+
+
     private OrderItemDetails toOrderItemDetails(OrderItem item) {
         return OrderItemDetails.newBuilder()
                 .setItemId(item.itemId().toString())
                 .setVariantId(item.variantId().toString())
+                .setName(item.name())
                 .setQuantity(item.quantity())
                 .setPrice(item.price().doubleValue())
                 .setIsReturnable(item.isReturnable())
                 .setImageUrl(item.imageUrl())
                 .setVariantId(item.variantId().toString())
                 .build();
-
-
     }
+
+    private OrderItem toOrderItem(OrderItemDetails orderItemDetails){
+        return new OrderItem(
+                new ItemId(UUID.fromString(orderItemDetails.getItemId())),
+                new VariantId(UUID.fromString(orderItemDetails.getVariantId())),
+                orderItemDetails.getName(),
+                orderItemDetails.getQuantity(),
+                BigDecimal.valueOf(orderItemDetails.getPrice()),
+                orderItemDetails.getImageUrl(),
+                orderItemDetails.getDescription(),
+                orderItemDetails.getIsReturnable()
+        );
+    }
+
+
 
 
 }
