@@ -8,6 +8,7 @@ import com.ecmsp.product.v1.reservation.v1.CreateVariantsReservationResponse;
 import com.ecmsp.product.v1.reservation.v1.VariantReservationServiceGrpc;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 
+
 class ReservationGrpcClient implements ReservationClient {
 
     //TODO: change to reservation service ?

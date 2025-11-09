@@ -42,6 +42,7 @@ class OrderEntityMapper {
             .map(item -> OrderItemEntity.builder()
                 .itemId(item.itemId().value())
                 .variantId(item.variantId() != null ? item.variantId().value() : null)
+                .name(item.name() != null ? item.name() : null)
                 .quantity(item.quantity())
                 .price(item.price())
                 .imageUrl(item.imageUrl())
