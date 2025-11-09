@@ -26,7 +26,8 @@ public class OrderGrpcMapper {
                 .setOrderId(order.orderId().toString())
                 .setOrderStatus(toOrderStatusProto(order.orderStatus()))
                 .setDate(order.date().toString())
-                .addAllItems(itemDetails);
+                .addAllItems(itemDetails)
+                .setClientId(order.clientId().toString());
 
         return builder.build();
     }
