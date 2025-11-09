@@ -1,5 +1,7 @@
 package com.ecmsp.orderservice.order.domain;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,7 +31,7 @@ public class DefaultOrderFacade implements OrderFacade {
         this.orderReturnabilityService = orderReturnabilityService;
         this.clock = clock;
     }
-
+    @Transactional
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
