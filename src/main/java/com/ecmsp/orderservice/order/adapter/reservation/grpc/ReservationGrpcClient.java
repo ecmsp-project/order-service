@@ -21,6 +21,7 @@ class ReservationGrpcClient implements ReservationClient {
 
     @Override
     public ReservationCreated createReservation(ReservationToCreate reservationToCreate) {
+        System.out.println("Calling gRPC to create reservation for orderId: " + reservationToCreate.orderId().value());
         CreateVariantsReservationRequest request = reservationGrpcMapper.toCreateReservationRequest(reservationToCreate);
         CreateVariantsReservationResponse reservationResponse = variantReservationServiceStub.createVariantsReservation(request);
         return reservationGrpcMapper.toReservationCreated(reservationResponse);

@@ -50,7 +50,7 @@ grpc:
       enabled: false # Set to true to enable TLS
   client:
     product-service:
-      address: ${PRODUCT_SERVICE_GRPC_URL:static://localhost:7200}
+      address: ${PRODUCT_SERVICE_GRPC_URL:static://localhost:7400}
       negotiationType: plaintext
 
 server:

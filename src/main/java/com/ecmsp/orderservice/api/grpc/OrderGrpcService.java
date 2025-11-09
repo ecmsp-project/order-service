@@ -110,13 +110,17 @@ class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
     @Override
     public void createOrder(CreateOrderRequest request, StreamObserver<CreateOrderResponse> responseObserver) {
         try {
+            System.out.println("Create order request received: " + request);
             UserContextData userContextData = UserContextGrpcHolder.getUserContext();
+            System.out.println("User context data: " + userContextData);
             ClientId clientId = new ClientId(UUID.fromString(userContextData.userId()));
 
             OrderToCreate orderToCreate = orderGrpcMapper.toOrderToCreate(clientId, request);
+            System.out.println("Order to create mapped: " + orderToCreate);
             OrderCreated orderCreated = orderFacade.createOrder(orderToCreate);
 
             CreateOrderResponse createOrderResponse = orderGrpcMapper.toCreateOrderResponse(orderCreated);
+            System.out.println("Create order response created: " + createOrderResponse);
 
             responseObserver.onNext(createOrderResponse);
             responseObserver.onCompleted();

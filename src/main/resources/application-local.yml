@@ -16,6 +16,6 @@ order:
 grpc:
   client:
     product-service:
-      address: static://localhost:7200
+      address: static://localhost:7400
       negotiationType: plaintext
 

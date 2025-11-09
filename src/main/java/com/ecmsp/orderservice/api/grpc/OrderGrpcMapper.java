@@ -94,15 +94,20 @@ class OrderGrpcMapper {
 
 
     public OrderToCreate toOrderToCreate(ClientId clientId, CreateOrderRequest createOrderRequest){
+        System.out.println("Mapping CreateOrderRequest to OrderToCreate: " + createOrderRequest);
 
         List<OrderItem> itemsList = createOrderRequest.getItemsList().stream()
                 .map(this::toOrderItem)
                 .toList();
-        return new OrderToCreate(
+
+        OrderToCreate orderToCreate = new OrderToCreate(
                 new ReservationId(UUID.randomUUID()), //TODO: should be removed it's only placeholder
                 clientId,
                 itemsList
         );
+
+        System.out.println("Mapped OrderToCreate: " + orderToCreate);
+        return orderToCreate;
     }
 
 

@@ -46,6 +46,7 @@ public class DefaultOrderFacade implements OrderFacade {
 
     public OrderCreated createOrder(OrderToCreate orderToCreate) {
 
+        System.out.println("Creating order for client: " + orderToCreate.clientId());
         OrderId orderId = orderIdGenerator.generate(null); //generate random UUID
 
         Order order = new Order(
@@ -57,7 +58,9 @@ public class DefaultOrderFacade implements OrderFacade {
                 /* items */ orderToCreate.items()
         );
 
+        System.out.println("Call reservation service to reserve variants for order: " + orderId);
         ReservationCreated reservationCreated = reservationClient.createReservation(orderMapper.toReservationToCreate(order));
+        System.out.println("Reservation service responded for order: " + orderId);
 
         // Check if any variants failed to be reserved (insufficient stock)
         boolean isReservationSuccessful = reservationCreated.variantsOutOfStock().isEmpty();
