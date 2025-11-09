@@ -16,6 +16,7 @@ class DbOrderRepository implements OrderRepository {
     }
 
     @Override
+    @Transactional
     public List<Order> findAll() {
         return orderEntityRepository.findAll()
             .stream()

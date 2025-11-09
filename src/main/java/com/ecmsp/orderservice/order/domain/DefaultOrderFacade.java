@@ -2,6 +2,7 @@ package com.ecmsp.orderservice.order.domain;
 
 import com.ecmsp.orderservice.order.domain.reservation.ReservationClient;
 import com.ecmsp.orderservice.order.domain.reservation.ReservationCreated;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -34,7 +35,7 @@ public class DefaultOrderFacade implements OrderFacade {
         this.orderMapper = orderMapper;
         this.clock = clock;
     }
-
+    @Transactional
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
