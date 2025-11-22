@@ -9,7 +9,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.format.DateTimeFormatter;
 
-class KafkaOrderEventPublisher implements OrderEventPublisher {
+public class KafkaOrderEventPublisher implements OrderEventPublisher {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 

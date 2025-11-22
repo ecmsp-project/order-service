@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.order.adapter.repository.db.outbox;
+package com.ecmsp.orderservice.outbox.adapter.repository;
 
 
 import jakarta.persistence.*;

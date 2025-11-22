@@ -1,19 +1,16 @@
-package com.ecmsp.orderservice.order.domain.outbox;
+package com.ecmsp.orderservice.outbox.domain;
 
 import com.ecmsp.orderservice.order.domain.OrderEvent;
 import com.ecmsp.orderservice.order.domain.OrderEventPublisher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 
-//TODO: service annotation shouldn't be in domain
-@Service
 @Slf4j
-class OutboxEventProcessor {
+public class OutboxEventProcessor {
 
     private final OutboxRepository outboxRepository;
     private final OrderEventPublisher orderEventPublisher;
@@ -51,13 +48,11 @@ class OutboxEventProcessor {
             Class<?> eventClass = Class.forName(eventType);
             Object deserializedEvent = objectMapper.readValue(event.payload(), eventClass);
 
-            if (deserializedEvent instanceof OrderEvent orderEvent) {
-                orderEventPublisher.publish(orderEvent);
-            } else {
-                throw new IllegalArgumentException("Unknown event type: " + eventType);
+            switch (deserializedEvent){
+                case OrderEvent orderEvent -> orderEventPublisher.publish(orderEvent);
+                default -> throw new IllegalArgumentException("Unknown event type: " + eventType);
             }
             outboxRepository.markAsProcessed(event.eventId());
-
             log.info("Successfully processed outbox event: id={}, eventType={}",
                     event.eventId(), eventType);
         } catch (Exception e) {

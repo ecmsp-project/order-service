@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.order.domain.outbox;
+package com.ecmsp.orderservice.outbox.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;

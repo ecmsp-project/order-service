@@ -1,10 +1,8 @@
-package com.ecmsp.orderservice.order.adapter.repository.db.outbox;
+package com.ecmsp.orderservice.outbox.adapter.repository;
 
-import com.ecmsp.orderservice.order.domain.outbox.EventId;
-import com.ecmsp.orderservice.order.domain.outbox.EventType;
-import com.ecmsp.orderservice.order.domain.outbox.OutboxEvent;
-
-import java.time.LocalDateTime;
+import com.ecmsp.orderservice.outbox.domain.EventId;
+import com.ecmsp.orderservice.outbox.domain.EventType;
+import com.ecmsp.orderservice.outbox.domain.OutboxEvent;
 
 class OutboxEntityMapper {
 
