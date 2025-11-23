@@ -1,8 +1,8 @@
-package com.ecmsp.orderservice.outbox.adapter.repository;
+package com.ecmsp.orderservice.order.adapter.publisher.outbox.db;
 
-import com.ecmsp.orderservice.outbox.domain.OutboxEvent;
-import com.ecmsp.orderservice.outbox.domain.EventId;
-import com.ecmsp.orderservice.outbox.domain.OutboxRepository;
+import com.ecmsp.orderservice.order.adapter.publisher.outbox.OutboxEvent;
+import com.ecmsp.orderservice.order.adapter.publisher.outbox.EventId;
+import com.ecmsp.orderservice.order.adapter.publisher.outbox.OutboxRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 

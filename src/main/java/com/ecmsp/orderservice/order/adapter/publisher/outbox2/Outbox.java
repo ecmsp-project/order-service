@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.outbox.adapter.repository;
+package com.ecmsp.orderservice.order.adapter.publisher.outbox2;
 
 
 import jakarta.persistence.*;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-class OutboxEntity {
+class Outbox {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "event_id")

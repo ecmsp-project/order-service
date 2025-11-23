@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.outbox.domain;
+package com.ecmsp.orderservice.order.adapter.publisher.outbox;
 
 import java.util.UUID;
 

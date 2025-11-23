@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.outbox.adapter.repository;
+package com.ecmsp.orderservice.order.adapter.publisher.outbox.db;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

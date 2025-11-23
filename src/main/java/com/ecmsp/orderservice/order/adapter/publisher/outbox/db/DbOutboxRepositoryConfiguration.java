@@ -1,6 +1,6 @@
-package com.ecmsp.orderservice.outbox.adapter.repository;
+package com.ecmsp.orderservice.order.adapter.publisher.outbox.db;
 
-import com.ecmsp.orderservice.outbox.domain.OutboxRepository;
+import com.ecmsp.orderservice.order.adapter.publisher.outbox.OutboxRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

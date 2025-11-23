@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.outbox.domain;
+package com.ecmsp.orderservice.order.adapter.publisher.outbox;
 
 import com.ecmsp.orderservice.order.domain.OrderEvent;
 import com.ecmsp.orderservice.order.domain.OrderEventPublisher;

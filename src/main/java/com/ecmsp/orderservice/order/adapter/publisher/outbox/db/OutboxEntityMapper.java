@@ -1,8 +1,8 @@
-package com.ecmsp.orderservice.outbox.adapter.repository;
+package com.ecmsp.orderservice.order.adapter.publisher.outbox.db;
 
-import com.ecmsp.orderservice.outbox.domain.EventId;
-import com.ecmsp.orderservice.outbox.domain.EventType;
-import com.ecmsp.orderservice.outbox.domain.OutboxEvent;
+import com.ecmsp.orderservice.order.adapter.publisher.outbox.EventId;
+import com.ecmsp.orderservice.order.adapter.publisher.outbox.EventType;
+import com.ecmsp.orderservice.order.adapter.publisher.outbox.OutboxEvent;
 
 class OutboxEntityMapper {
 
