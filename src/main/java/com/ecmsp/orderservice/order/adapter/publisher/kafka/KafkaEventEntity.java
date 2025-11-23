@@ -1,4 +1,4 @@
-package com.ecmsp.orderservice.order.adapter.publisher.outbox2;
+package com.ecmsp.orderservice.order.adapter.publisher.kafka;
 
 
 import jakarta.persistence.*;
@@ -15,10 +15,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "kafka_outbox")
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-class Outbox {
+class KafkaEventEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "event_id")
@@ -27,6 +27,14 @@ class Outbox {
     @Column(name = "payload", columnDefinition = "TEXT")
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     private String payload;
+
+    @Column(name = "key", columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    private String key;
+
+    @Column(name = "topic", columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    private String topic;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -37,8 +45,4 @@ class Outbox {
 
     @Column(name = "processed_at")
     private LocalDateTime processedAt;
-
-
-    @Column(name = "event_type", nullable = false)
-    private String eventType;
 }

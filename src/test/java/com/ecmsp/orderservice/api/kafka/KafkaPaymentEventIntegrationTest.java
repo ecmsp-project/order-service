@@ -52,7 +52,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = {
-        "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}"
+        "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
+        "order.event-publisher.type=kafka",
+        "order.event-publisher.outbox-type=in-memory"
 })
 @Import({KafkaPaymentEventIntegrationTest.TestKafkaEventListener.class, TestReservationClientConfiguration.class})
 class KafkaPaymentEventIntegrationTest {
@@ -246,7 +248,7 @@ class KafkaPaymentEventIntegrationTest {
     }
 
     @Test
-    void should_publish_order_created_event_to_kafka_when_order_is_created() throws Exception {
+    void    should_publish_order_created_event_to_kafka_when_order_is_created() throws Exception {
         // Given: Order details
         ClientId clientId = new ClientId(UUID.randomUUID());
         BigDecimal itemPrice = new BigDecimal("50.00");
