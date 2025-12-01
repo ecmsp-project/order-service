@@ -51,7 +51,7 @@ grpc:
       enabled: false # Set to true to enable TLS
   client:
     product-service:
-      address: http://localhost:7400
+      address: localhost:7400
       negotiationType: plaintext
 
 server:

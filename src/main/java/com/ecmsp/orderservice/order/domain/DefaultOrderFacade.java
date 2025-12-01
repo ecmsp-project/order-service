@@ -77,7 +77,6 @@ public class DefaultOrderFacade implements OrderFacade {
             );
 
 
-            //todo publish event via outbox pattern
             orderEventPublisher.publish(orderCreatedEvent);
         }
 
@@ -106,8 +105,6 @@ public class DefaultOrderFacade implements OrderFacade {
 
         orderRepository.update(updatedOrder);
 
-        //todo publish event via outbox pattern
-        // event consumed by product service
         orderEventPublisher.publish(
                 new OrderEvent.OrderStatusUpdated(
                         updatedOrder.orderId(),

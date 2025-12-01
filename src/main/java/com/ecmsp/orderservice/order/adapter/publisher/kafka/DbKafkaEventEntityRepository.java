@@ -1,32 +1,35 @@
 package com.ecmsp.orderservice.order.adapter.publisher.kafka;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Repository
-@ConditionalOnProperty(
-    name = "order.event-publisher.outbox-type",
-    havingValue = "db"
-)
-interface DbKafkaEventEntityRepository extends JpaRepository<KafkaEventEntity, UUID>, KafkaEventEntityRepository  {
+public class DbKafkaEventEntityRepository implements KafkaEventEntityRepository{
 
-    List<KafkaEventEntity> findByProcessedFalseOrderByCreatedAtAsc();
+    private final KafkaEventEntityJpaRepository jpaRepository;
 
-    @Modifying
-    @Query("DELETE FROM KafkaEventEntity o WHERE o.processed = true AND o.processedAt < :before")
-    void deleteProcessedEventsBefore(@Param("before") LocalDateTime before);
-
-    @Modifying
-    @Query("UPDATE KafkaEventEntity o SET o.processed = true, o.processedAt = :processedAt WHERE o.eventId = :eventId")
-    void markAsProcessed(@Param("eventId") UUID eventId, @Param("processedAt") LocalDateTime processedAt);
+    public DbKafkaEventEntityRepository(KafkaEventEntityJpaRepository jpaRepository) {
+        this.jpaRepository = jpaRepository;
+    }
 
 
+    @Override
+    public List<KafkaEventEntity> findByProcessedFalseOrderByCreatedAtAsc() {
+        return jpaRepository.findByProcessedFalseOrderByCreatedAtAsc();
+    }
+
+    @Override
+    public void deleteProcessedEventsBefore(LocalDateTime before) {
+        jpaRepository.deleteProcessedEventsBefore(before);
+    }
+
+    @Override
+    public void markAsProcessed(UUID eventId, LocalDateTime processedAt) {
+        jpaRepository.markAsProcessed(eventId, processedAt);
+    }
+
+    @Override
+    public KafkaEventEntity save(KafkaEventEntity entity) {
+        return jpaRepository.save(entity);
+    }
 }

@@ -4,6 +4,7 @@ import com.ecmsp.orderservice.order.domain.OrderEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -50,6 +51,7 @@ class Outbox {
                     .topic(orderStatusUpdatedTopic)
                     .key(kafkaEvent.orderId())
                     .payload(objectMapper.writeValueAsString(kafkaEvent))
+                    .createdAt(LocalDateTime.now())
                     .build();
             }
             case OrderEvent.OrderCreated orderCreatedEvent -> {
@@ -64,6 +66,7 @@ class Outbox {
                     .topic(orderCreatedTopic)
                     .key(kafkaEvent.orderId())
                     .payload(objectMapper.writeValueAsString(kafkaEvent))
+                    .createdAt(LocalDateTime.now())
                     .build();
             }
         };

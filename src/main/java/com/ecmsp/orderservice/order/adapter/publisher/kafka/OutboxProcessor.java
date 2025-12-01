@@ -21,7 +21,7 @@ class OutboxProcessor {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    @Scheduled(fixedDelay = 100)
+    @Scheduled(fixedDelay = 2000)
     public void processOutboxEvents() {
         try {
             List<KafkaEventEntity> unprocessedEvents = kafkaEventEntityRepository.findByProcessedFalseOrderByCreatedAtAsc();

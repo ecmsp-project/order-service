@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
@@ -14,6 +15,17 @@ import org.springframework.kafka.core.KafkaTemplate;
     name = "type",
     havingValue = "kafka")
 class KafkaOrderEventPublisherConfiguration {
+
+    @Configuration
+    @ConditionalOnProperty(
+        name = "order.event-publisher.outbox-type",
+        havingValue = "db"
+    )
+    @EnableJpaRepositories(basePackages = "com.ecmsp.orderservice.order.adapter.publisher.kafka")
+    static class JpaConfiguration {
+    }
+
+
 
     @Bean
     Outbox outbox(
@@ -46,5 +58,16 @@ class KafkaOrderEventPublisherConfiguration {
     KafkaEventEntityRepository inMemoryKafkaEventEntityRepository() {
         return new InMemoryEventEntityRepository();
     }
+
+    @Bean
+    @ConditionalOnProperty(
+            name = "order.event-publisher.outbox-type",
+            havingValue = "db"
+    )
+    KafkaEventEntityRepository dbKafkaEventEntityRepository(KafkaEventEntityJpaRepository jpaRepository) {
+        return new DbKafkaEventEntityRepository(jpaRepository);
+    }
+
+
 
 }

@@ -4,8 +4,9 @@
 CREATE TABLE kafka_outbox
 (
     event_id     UUID PRIMARY KEY,
-    event_type   VARCHAR(255) NOT NULL,
-    payload      TEXT         NOT NULL,
+    payload      TEXT,
+    key          TEXT,
+    topic        TEXT,
     created_at   TIMESTAMP    NOT NULL,
     processed    BOOLEAN      NOT NULL DEFAULT FALSE,
     processed_at TIMESTAMP
