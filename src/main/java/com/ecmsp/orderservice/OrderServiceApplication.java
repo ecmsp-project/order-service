@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @SpringBootApplication(
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Profile;
         HibernateJpaAutoConfiguration.class
     }
 )
+@EnableScheduling
 public class OrderServiceApplication {
 
 	public static void main(String[] args) {

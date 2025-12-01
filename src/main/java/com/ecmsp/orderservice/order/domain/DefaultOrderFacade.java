@@ -76,6 +76,7 @@ public class DefaultOrderFacade implements OrderFacade {
                     LocalDateTime.now(clock)
             );
 
+
             orderEventPublisher.publish(orderCreatedEvent);
         }
 
@@ -104,7 +105,6 @@ public class DefaultOrderFacade implements OrderFacade {
 
         orderRepository.update(updatedOrder);
 
-        // event consumed by product service
         orderEventPublisher.publish(
                 new OrderEvent.OrderStatusUpdated(
                         updatedOrder.orderId(),
