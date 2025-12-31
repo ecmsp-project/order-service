@@ -1,0 +1,21 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+  datasource:
+    url: jdbc:postgresql://localhost:9300/order-service-db
+    username: admin
+    password: admin
+
+
+order:
+  repository:
+    type: db
+  event-publisher:
+    type: in-memory
+
+grpc:
+  client:
+    product-service:
+      address: static://localhost:7400
+      negotiationType: plaintext
+

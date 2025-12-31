@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: Order service
+  jpa:
+    hibernate.ddl-auto: validate # TODO: jdbc test doesn't work because example data are added in migration scripts
+    properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+#   datasource:
+#     url: ${DB_URL}
+#     username: ${DB_USERNAME}
+#     password: ${DB_PASSWORD}
+  kafka:
+    consumer:
+      group-id: order-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#     bootstrap-servers: ${KAFKA_URL}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+order:
+  repository:
+    type: db
+  event-publisher:
+    type: kafka
+    outbox-type: db
+  id-generator:
+    type: random
+
+
+kafka:
+  topic:
+    payment-processed-succeeded: payment-processed-succeeded
+    payment-processed-failed: payment-processed-failed
+    order-created: order-created
+    order-status-updated: order-status-updated
+    cart-event: cart-event
+
+grpc:
+  server:
+    port: 7300
+    security:
+      enabled: false # Set to true to enable TLS
+  client:
+    product-service:
+      address: localhost:7400
+      negotiationType: plaintext
+
+server:
+  port: 8300
